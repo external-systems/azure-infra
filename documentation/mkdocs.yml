@@ -19,6 +19,7 @@ nav:
       - Making changes: guide/making-changes.md
       - Operations: guide/operations.md
       - Costs: guide/costs.md
+      - Backups and recovery: guide/backups.md
       - Troubleshooting: guide/troubleshooting.md
       - Migrating from Rackspace: guide/migrating-from-rackspace.md
   - AI assistance: ai-skill.md

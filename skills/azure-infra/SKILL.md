@@ -1,6 +1,6 @@
 ---
 name: azure-infra
-description: "Help the operator of the external-systems/azure-infra repo understand and change their Azure SQL server through pull requests: one Windows Server 2019 VM with SQL Server 2019 Web edition, built with terranix and OpenTofu, planned and applied by GitHub Actions, secrets in 1Password. The operator may be completely non-technical and works only in a browser. Load for any question or change about this repo, the server, its firewall, size, disks, passwords, costs, a plan on a pull request, a failed run, or the move from Rackspace."
+description: "Help the operator of the external-systems/azure-infra repo understand and change their Azure SQL server through pull requests: one Windows Server 2019 VM with SQL Server 2019 Web edition, built with terranix and OpenTofu, planned and applied by GitHub Actions, secrets in 1Password. The operator may be completely non-technical and works only in a browser. Load for any question or change about this repo, the server, its firewall, size, disks, passwords, costs, a plan on a pull request, a failed run, backups and restores, the move from Rackspace, or getting started from nothing (no Azure account yet, first deploy)."
 ---
 
 # azure-infra
@@ -30,6 +30,40 @@ tools installed and do not need any. So:
   ("Review deployments" > Approve), and, rarely, a field in 1Password.
 - If they seem unsure, stop and offer to wait for Andrew (the repo owner).
   Saying no is always safe.
+
+## Getting started from nothing (first-time setup)
+
+If the server does not exist yet (they say "get started", "set up",
+"I have no Azure account", or the vault/environments are missing), you are
+their guide through
+[documentation/docs/getting-started.md](../../documentation/docs/getting-started.md).
+Everything happens in their browser; you cannot click in Azure, 1Password
+or GitHub settings for them, so you tell them exactly what to click.
+
+- **One step at a time.** Read the page, then give them only the current
+  step, in your own simple words, with the links. Wait for "done" and
+  check the step's "Done when" with them before moving on. Ask them where
+  they are if they come back later.
+- **Never let a secret into the chat.** Codes, keys, tokens and passwords
+  go from the screen straight into 1Password. Say so before steps 3 and 5.
+  If they paste one anyway: tell them calmly, and have them make a new one
+  (step 3: paste the setup line again; step 5: delete and recreate that
+  service account) and update 1Password.
+- **Step 5 needs admin rights on the GitHub repo.** If they cannot see
+  **Settings** on the repo, stop and ask Andrew to do step 5 (or to make
+  them admin).
+- **Step 6 (first build):** you may start Actions > Infrastructure > Run
+  workflow on `main` for them if you have a tool for it; otherwise guide
+  them. Read the `plan` job's output and explain it: a first build is
+  only `+` (about 17 resources), roughly $385 a month
+  ([costs](../../documentation/docs/guide/costs.md)), nothing to lose yet.
+  Then they click **Review deployments** > Approve. You never approve.
+- If a step fails, read the error with them, check
+  [troubleshooting](../../documentation/docs/guide/troubleshooting.md),
+  and if it is not clear, stop and suggest asking Andrew.
+- After the first build: show them where the server's address and
+  passwords are (1Password items `sql-web-01 Windows admin` and
+  `sql-web-01 SQL login`), then explain how future changes work (below).
 
 ## The change loop (the only way to change the server)
 
@@ -75,7 +109,7 @@ Details for each step: [documentation/docs/guide/making-changes.md](../../docume
 |---|---|---|
 | `terranix/settings.nix` | Name, region, VM size, disks, who may reach SQL | Yes: almost every change |
 | `terranix/sql-server.nix` | Every Azure resource and option, each with a description saying what it does and whether changing it rebuilds things | Only for new features, with Andrew |
-| `terranix/state.nix` | Where OpenTofu keeps its memory (encrypted, Hetzner bucket) | No |
+| `terranix/state.nix` | Where OpenTofu keeps its memory (encrypted, in an Azure storage account) | No |
 | `.env.schema` | Which 1Password entries feed which setting (references only) | No |
 | `.github/workflows/infra.yml` | The check, plan and apply robot | Never |
 | `.github/workflows/docs.yml` | Publishes the docs website | Never |
@@ -93,7 +127,8 @@ plus a manual workflow run; see the firewall recipe in making-changes.md.
 | Understand what exists and why (in plain words) | [documentation/docs/guide/azure-concepts.md](../../documentation/docs/guide/azure-concepts.md) |
 | Change something (who can connect, size, disk space, patch time) | [documentation/docs/guide/making-changes.md](../../documentation/docs/guide/making-changes.md) |
 | Know what it costs, or what a change would cost | [documentation/docs/guide/costs.md](../../documentation/docs/guide/costs.md) |
-| Know passwords, updates, backups | [documentation/docs/guide/operations.md](../../documentation/docs/guide/operations.md) |
+| Know how backups work, check them, or get data back | [documentation/docs/guide/backups.md](../../documentation/docs/guide/backups.md) |
+| Know passwords, updates | [documentation/docs/guide/operations.md](../../documentation/docs/guide/operations.md) |
 | Fix a failed check, plan or apply | [documentation/docs/guide/troubleshooting.md](../../documentation/docs/guide/troubleshooting.md) |
 | Move the databases from Rackspace | [documentation/docs/guide/migrating-from-rackspace.md](../../documentation/docs/guide/migrating-from-rackspace.md) |
 | Set up everything from zero, browser only (no Azure account yet) | [documentation/docs/getting-started.md](../../documentation/docs/getting-started.md): walk them through it one step at a time |
@@ -114,14 +149,14 @@ Translate each resource line into one plain sentence, then the summary:
 
 Prices: use the estimate and the "What changes the cost" table in
 [costs.md](../../documentation/docs/guide/costs.md), as rough numbers
-("about $380 a month now; this makes it about $240"). Any change to region,
+("about $385 a month now; this makes it about $240"). Any change to region,
 VM size, image, disks or public IP also updates costs.md in the same pull
 request, and the PR description says how the monthly total changes. For the
 real bill, point to Cost Management in the Azure portal.
 
 ## Hard rules
 
-- Public repo: never write a password, key, bucket name, IP address,
+- Public repo: never write a password, key, storage account name, IP address,
   subscription or tenant id into a file, commit, PR text or comment.
 - Never edit workflows, secrets, environments or repository settings.
 - Never add `-auto-approve`, never remove `prevent_destroy`/`protectData`,

@@ -18,7 +18,7 @@ terranix/settings.nix --(Nix, terranix)--> config.tf.json --(OpenTofu)--> Azure
        you edit                               generated                real server
                                                   |
                         state: what OpenTofu built last time
-                        encrypted, in a private Hetzner Object Storage bucket
+                        encrypted, in a private Azure storage account
 ```
 
 - **terranix** turns the Nix files in `terranix/` into OpenTofu's JSON.

@@ -7,7 +7,6 @@
 | Windows `azureadmin` | 1Password `<name> Windows admin` | In 1Password, generate a new password on the item. Then `az vm user update -g rg-<name> -n vm-<name> -u azureadmin -p '<new>'` (or reset it in the portal: VM > Help > Reset password). OpenTofu ignores later password changes on purpose: Azure could only apply them by rebuilding the VM. |
 | SQL `sqladmin` | 1Password `<name> SQL login` | Generate a new one on the item, then in SSMS: `ALTER LOGIN sqladmin WITH PASSWORD = '<new>';` |
 | Azure service principal | 1Password `azure-service-principal` | `az ad sp credential reset --id <client_id>`, store the new password in `client_secret`. |
-| Hetzner S3 keys | 1Password `hetzner-s3-state` | Generate new keys in the Hetzner console, update the item, delete the old keys. |
 | State passphrase | 1Password `tofu-state-passphrase` | **Do not.** Rotating needs OpenTofu's key-migration (`fallback`) config; plan it as a change. |
 
 Lost the admin password: reset it as above; nothing in OpenTofu changes.
@@ -41,13 +40,11 @@ filtered by resource group `rg-<name>` or tag `managed-by = azure-infra`.
 
 ## Backups
 
-Not configured by this repo yet. Until it is, take regular native backups
-(`BACKUP DATABASE ... TO DISK = 'F:\backup\...' WITH COMPRESSION, CHECKSUM`)
-and copy them off the VM, or enable Azure Backup for SQL Server in Azure
-VM in the portal. Adding `auto_backup` (needs a storage account) to
-`azurerm_mssql_virtual_machine` is the natural next feature.
-
-Disk snapshots are not database backups: restore-tested `.bak` files are.
+SQL Server Automated Backup is on (`sql.backup`): full and log backups of
+every database to the storage account `sqlbk...` (output
+`backup_storage_account`), kept `retentionDays` (30), geo-redundant. How it
+works, what to check and how to restore, in plain words:
+[Backups and recovery](backups.md).
 
 ## Looking around safely
 

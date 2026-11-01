@@ -20,6 +20,8 @@ Last checked: **2026-11-01**. List prices, pay-as-you-go, USD.
 | Image | SQL Server 2019 Web on Windows Server 2019, pay-as-you-go licensing |
 | Disks | OS 127 GB, data 256 GB, log 128 GB, all Premium SSD (LRS) |
 | Public IP | 1 static, Standard |
+| Backups | SQL Automated Backup, 30 days, geo-redundant storage (GRS) |
+| State | OpenTofu state in a small GRS storage account |
 
 ## Monthly estimate
 
@@ -31,9 +33,11 @@ Last checked: **2026-11-01**. List prices, pay-as-you-go, USD.
 | Log disk, 128 GB Premium SSD (P10) | per month, always | ~$20 |
 | Data disk, 256 GB Premium SSD (P15) | per month, always | ~$38 |
 | Static public IP (Standard) | per hour, always | ~$4 |
+| Backup storage (GRS, about $0.05 per GB) | per GB stored | ~$5 for 100 GB of backups |
+| State storage (a few MB) | per GB stored | under $1 |
 | Outbound traffic | first 100 GB/month free, then ~$0.09/GB | $0 to a few dollars |
 | Virtual network, firewall (NSG), boot diagnostics | free or negligible | ~$0 |
-| **Total** | | **~$380** |
+| **Total** | | **~$385** |
 
 How sure these numbers are:
 
@@ -53,6 +57,8 @@ How sure these numbers are:
 | VM size one step down (`Standard_D2s_v5`, 2 vCPU, 8 GiB) | VM + licenses roughly halve: total ~$240 |
 | VM size one step up (`Standard_D8s_v5`, 8 vCPU, 32 GiB) | VM + licenses roughly double: total ~$680 |
 | Data disk 256 GB to 512 GB (P15 to P20) | about +$35 |
+| Backup retention 30 to 60 days | backup storage roughly doubles (a few dollars) |
+| Backup replication GRS to LRS | backup storage roughly halves, but no copy in a second region |
 | Region | small differences; Central US is similar |
 | SQL connectivity `PUBLIC` vs `PRIVATE` | no cost change |
 | Firewall IPs (1Password) | no cost change |

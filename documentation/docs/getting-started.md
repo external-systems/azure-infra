@@ -8,33 +8,49 @@ technical work for you.
 Plan about **1 to 2 hours**, once. Do the steps in order. Each step says
 exactly what to click and what to type.
 
-!!! tip "Stuck?"
-    Stop and ask Claude (see [step 8](#step-8-talk-to-claude-from-now-on))
-    or Andrew. Copy what is on your screen into the chat. Nothing on this
-    page can break anything until the very last step, and even that step
-    waits for your "yes".
+## Easiest: let Claude guide you
+
+Open Claude in a second browser tab and let it walk you through this page,
+one step at a time:
+
+1. Go to <https://claude.ai/code> and sign in. When it asks, click
+   **Connect GitHub** and allow it.
+2. Choose the repository `external-systems/azure-infra`.
+3. Type: **"Help me get started with azure-infra from the beginning. I
+   have no Azure account and I am not technical."**
+
+Claude knows this project (it has a guide built in). It tells you what to
+click, waits for you, and explains anything you see. You can also just read
+this page on your own: the steps are the same.
+
+!!! warning "Never paste codes into the chat"
+    Show Claude error messages and what you see, but **never** a password,
+    key, secret or token. Those go only into 1Password.
+
+Nothing on this page can break anything until the step 6 build, and even
+that waits for your "yes". Stuck? Ask Claude or Andrew.
 
 ## What you will need
 
 - [ ] A computer with a web browser (Chrome, Edge, Safari or Firefox)
 - [ ] An email address and your phone (for codes)
-- [ ] A credit card (Azure and Hetzner check your identity with it)
+- [ ] A credit card (Azure checks your identity with it)
 - [ ] A **1Password** account (the password manager). Andrew can invite you.
 - [ ] A **GitHub** account with access to this project. Andrew can invite you.
 
 ## The big picture
 
-You will make four things, and write the important codes into 1Password:
+You will do seven steps, and write the important codes into 1Password:
 
 | Step | What | Like... |
 |---|---|---|
 | 1 | A safe in 1Password | A locked drawer for all the keys |
 | 2 | An Azure account | Renting the building |
-| 3 | A robot key for Azure | A key card the robot uses to enter the building |
-| 4 | A storage box at Hetzner | A notebook where the robot writes what it built |
-| 5 | Two more entries in 1Password | A secret code and a short list of settings |
-| 6 | Tell GitHub how to open the safe | Giving the robot the drawer key |
-| 7 | Build the server | Pressing "go" and saying "yes" |
+| 3 | Paste one line in Azure | Making the robot's key card and its notebook |
+| 4 | Two more entries in 1Password | A secret code and a short list of settings |
+| 5 | Tell GitHub how to open the safe | Giving the robot the drawer key |
+| 6 | Build the server | Pressing "go" and saying "yes" |
+| 7 | Talk to Claude | From now on, just ask |
 
 !!! warning "The one rule"
     Codes, passwords and keys go **only into 1Password**. Never paste them
@@ -79,7 +95,7 @@ Azure is Microsoft's cloud: you rent a computer there by the hour.
    **Pay-As-You-Go** and confirm.
 6. Protect yourself from surprise bills: search **Budgets**, click
    **+ Add**, amount `450` (dollars per month), add your email for alerts,
-   and **Create**. The server costs about $380 a month
+   and **Create**. The server costs about $385 a month
    ([details](guide/costs.md)).
 7. Make sure Azure lets you rent a server this size: search **Quotas**,
    click **Compute**, set Region to **South Central US**, and search
@@ -90,87 +106,67 @@ Azure is Microsoft's cloud: you rent a computer there by the hour.
 Done when: you can open the Azure portal and see your Pay-As-You-Go
 subscription.
 
-## Step 3: Make the robot's key for Azure
+## Step 3: Run the setup script
 
-The robot needs its own login to Azure. You create it by pasting **one
-line** into a black box in the browser.
+The robot needs two things in Azure: its own **login** (a key card), and a
+small locked **storage box** where it writes down what it built. One
+pasted line makes both.
 
 1. In the Azure portal, click the **>_** icon at the top right (Cloud
    Shell). A black panel opens at the bottom.
 2. If it asks: choose **Bash**. If it asks about storage, choose **No
    storage account required**, pick your subscription, and click
    **Apply**.
-3. Wait until you see a line ending in `$`. Copy this whole line (use the
-   copy button on the right of the box), click into the black panel,
-   paste it (right-click > Paste, or Ctrl+Shift+V), and press **Enter**:
+3. Wait until you see a line ending in `$`. Copy this line (use the copy
+   button on the right of the box), click into the black panel, paste it
+   (right-click > Paste, or Ctrl+Shift+V), and press **Enter**:
 
     ```sh
-    SUB=$(az account show --query id -o tsv); az ad sp create-for-rbac --name azure-infra-tofu --role Contributor --scopes /subscriptions/$SUB --query "{subscription_id:'$SUB', tenant_id:tenant, client_id:appId, client_secret:password}" -o yaml
+    curl -fsSL https://raw.githubusercontent.com/external-systems/azure-infra/main/scripts/azure-bootstrap.sh | bash
     ```
 
-4. After a few seconds it shows four lines like:
+4. It works for a minute or two, then shows a box like this:
 
     ```
-    client_id: 1a2b3c...
-    client_secret: AbC~dEf...
-    subscription_id: 9z8y7x...
-    tenant_id: 5e6f7g...
+    ==================== copy these into 1Password ====================
+    Item azure-service-principal:
+      subscription_id:        9z8y7x...
+      tenant_id:              5e6f7g...
+      client_id:              1a2b3c...
+      client_secret:          AbC~dEf...
+    Item sql-server-settings:
+      state_storage_account:  tfstate1a2b3c4d5e
+    ===================================================================
     ```
 
-5. **Right away**, put them in 1Password (the secret is shown only once).
-   Title: `azure-service-principal`. Fields:
+5. **Right away**, put the first four into 1Password (the secret is shown
+   only once). Title: `azure-service-principal`. Fields:
 
     | Label | Type | Value |
     |---|---|---|
-    | `subscription_id` | Text | the `subscription_id` line |
-    | `tenant_id` | Text | the `tenant_id` line |
-    | `client_id` | Text | the `client_id` line |
-    | `client_secret` | Password | the `client_secret` line |
+    | `subscription_id` | Text | the `subscription_id` value |
+    | `tenant_id` | Text | the `tenant_id` value |
+    | `client_id` | Text | the `client_id` value |
+    | `client_secret` | Password | the `client_secret` value |
 
-    Copy only the part after `: `.
+    Copy only the part after the colon and spaces.
 
-6. Close the black panel.
+6. Keep the `state_storage_account` value for step 4. Then type `clear`,
+   press **Enter**, and close the black panel.
 
 Done when: the 1Password item `azure-service-principal` has four filled
-fields. (If you lost the secret: paste the same line again; it makes a new
-one.)
+fields. If something went wrong or you lost the secret, paste the same line
+again: it is safe to run twice.
 
-## Step 4: Make the storage box at Hetzner
+## Step 4: Two more 1Password entries
 
-The robot keeps a notebook of what it built, locked and encrypted. It
-lives in a small storage box at Hetzner (a hosting company). It costs a few
-euros a month.
-
-1. Go to <https://console.hetzner.cloud>, sign up or sign in, and open (or
-   create) a project.
-2. On the left click **Object Storage**, then **Create Bucket**.
-3. Location: **Helsinki** (hel1). Name: anything unique, for example
-   `azure-infra-state-` followed by a few random letters. Visibility:
-   **Private**. Click **Create**.
-4. Still in Object Storage, open **S3 Credentials** (or **Security** >
-   **S3 credentials**) and click **Generate credentials**. It shows an
-   **Access key** and a **Secret key**, only once.
-5. In 1Password, title `hetzner-s3-state`. Fields:
-
-    | Label | Type | Value |
-    |---|---|---|
-    | `access_key_id` | Text | the Access key |
-    | `secret_access_key` | Password | the Secret key |
-
-Keep the bucket name handy for the next step.
-
-If Andrew already made the bucket, skip to step 5 and ask him for the
-name.
-
-## Step 5: Two more 1Password entries
-
-**A. The notebook's lock code.**
+**A. The storage box's lock code.**
 
 1. In 1Password, **+ New Item** > **Password**. Title: `tofu-state-passphrase`.
 2. In the password field, click the **generate** button (dice icon), set
    the length to the maximum, and **Save**.
 3. **Never change or delete this item.** Without it, the robot cannot read
-   its notebook.
+   its notes.
 
 **B. The private settings.**
 
@@ -179,7 +175,7 @@ name.
 
     | Label | Type | Value |
     |---|---|---|
-    | `state_bucket` | Text | the bucket name from step 4 |
+    | `state_storage_account` | Text | the `state_storage_account` value from step 3 |
     | `rdp_source_cidrs` | Text | your home internet address + `/32` (see below) |
     | `sql_source_cidrs` | Text | leave empty |
 
@@ -188,11 +184,10 @@ name.
    `203.0.113.7/32`. This lets only your home connect to the server's
    screen. Leave the field empty if nobody should connect yet.
 
-Done when: the `azure-infra` vault has these four items:
-`azure-service-principal`, `hetzner-s3-state`, `tofu-state-passphrase`,
-`sql-server-settings`.
+Done when: the `azure-infra` vault has these three items:
+`azure-service-principal`, `tofu-state-passphrase`, `sql-server-settings`.
 
-## Step 6: Let GitHub open the safe
+## Step 5: Let GitHub open the safe
 
 GitHub's robot needs a key to the `azure-infra` vault. 1Password calls
 these **service accounts**. You make two: one that can only look (for
@@ -237,7 +232,7 @@ The project's other GitHub safety settings (who may make changes, a
 protected main branch) are Andrew's job:
 [GitHub setup](guide/github-setup.md).
 
-## Step 7: Build the server
+## Step 6: Build the server
 
 1. On GitHub, open the project and click **Actions** (top).
 2. On the left click **Infrastructure**. On the right click **Run
@@ -245,7 +240,7 @@ protected main branch) are Andrew's job:
 3. Wait a minute and click the new run. You see three boxes: `check`,
    `plan`, `apply`. `check` and `plan` turn green in a few minutes.
 4. Click **plan** to see what will be built. Near the bottom it says
-   something like `Plan: 16 to add, 0 to change, 0 to destroy.` For a first
+   something like `Plan: 17 to add, 0 to change, 0 to destroy.` For a first
    build, only "add" should be more than 0. Ask Claude to explain it if you
    like.
 5. A yellow box says **Review deployments**. Click it, tick
@@ -258,12 +253,13 @@ protected main branch) are Andrew's job:
 If anything turns red: click it, copy the red text, and give it to Claude
 or Andrew.
 
-## Step 8: Talk to Claude from now on
+## Step 7: Talk to Claude from now on
 
 From now on you change the server by **asking Claude in your browser**.
 
-1. Go to <https://claude.ai/code> and connect GitHub when it asks.
-2. Pick the project `external-systems/azure-infra`.
+1. Go to <https://claude.ai/code> (as in "Easiest: let Claude guide you"
+   at the top).
+2. Pick the repository `external-systems/azure-infra`.
 3. Ask in plain words, for example:
     - "What is this server and what does it cost each month?"
     - "Let my office internet connect to the server."
@@ -271,7 +267,7 @@ From now on you change the server by **asking Claude in your browser**.
 
 Claude makes a proposal, shows you what would change, what it costs, and
 whether the database goes offline, and only continues when you say
-**yes**. At the end, you click **Approve** on GitHub (like step 7.5).
+**yes**. At the end, you click **Approve** on GitHub (like step 6.5).
 More about this: [For the operator](operator.md).
 
 ## Words you might see

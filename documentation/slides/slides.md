@@ -63,7 +63,7 @@ Note: Any minus on the VM, a disk or the resource group means data loss. The rep
 
 ## Secrets
 
-- Public repo: no passwords, keys, bucket names or IPs in it
+- Public repo: no passwords, keys, account names or IPs in it
 - `.env.schema` holds only `op://` references
 - Varlock + 1Password plugin load them for each tofu run
 - Desktop app with biometric unlock, or a service account in CI
@@ -74,7 +74,7 @@ Note: Any minus on the VM, a disk or the resource group means data loss. The rep
 
 - OpenTofu's memory of what it built
 - Contains the server passwords, so it is **encrypted**
-- Stored in a private Hetzner bucket, locked during applies
+- Stored in a private Azure storage account, locked during applies
 - Never delete it, never change its passphrase
 
 ---
@@ -99,7 +99,7 @@ Note: Any minus on the VM, a disk or the resource group means data loss. The rep
 
 ## Next steps
 
-1. First-time setup (1Password, Azure, Hetzner)
+1. First-time setup (1Password, Azure)
 2. First `apply`
 3. Rehearse the database move
 4. Cutover, then backups

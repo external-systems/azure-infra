@@ -18,7 +18,7 @@ in `terranix/settings.nix`.
 
 Create a branch from the latest `main` (e.g. `change/bigger-server`),
 make the smallest edit that does it, commit with a message that says why.
-Never edit `.github/`, never put a password, key, bucket name or IP address
+Never edit `.github/`, never put a password, key, storage account name or IP address
 in a file.
 
 If the change touches the region, VM size, image, disks or public IP, also

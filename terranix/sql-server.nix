@@ -183,6 +183,24 @@ in {
         default = "D:\\tempDb";
         description = "tempdb folder, on the VM's fast local temporary disk (D:).";
       };
+      backup = {
+        enable = mkOption {
+          type = types.bool;
+          default = true;
+          description = "SQL Server Automated Backup: full and log backups of every database (and the system databases) to a storage account, managed by the SQL IaaS extension. In place, no downtime.";
+        };
+        retentionDays = mkOption {
+          type = types.ints.between 1 90;
+          default = 30;
+          description = "How many days of backups to keep; any moment in that range can be restored. More days, more storage cost. In place.";
+        };
+        replication = mkOption {
+          type = types.enum ["LRS" "ZRS" "GRS" "RAGRS"];
+          default = "GRS";
+          description = "Copies of the backup storage: LRS 3 copies in one data center; GRS also 3 more in the paired region (North Central US for South Central US), so backups survive a regional outage. Changing it is in place.";
+        };
+      };
+
       autoPatching = {
         enabled = mkOption {
           type = types.bool;
@@ -456,6 +474,26 @@ in {
 
     # --- SQL Server IaaS Agent: license, storage layout, patching --- #
     {
+      # --- Backups: storage account the SQL IaaS extension writes to --- #
+      # Name: globally unique, derived from the subscription and server
+      # name, so nothing private is in the repo and it never changes.
+      data.azurerm_client_config.current = mkIf cfg.sql.backup.enable {};
+      resource.azurerm_storage_account.backup = mkIf cfg.sql.backup.enable {
+        inherit tags;
+        name = "sqlbk\${substr(sha1(\"\${data.azurerm_client_config.current.subscription_id}/${cfg.name}\"), 0, 12)}";
+        resource_group_name = rgName;
+        inherit location;
+        account_kind = "StorageV2";
+        account_tier = "Standard";
+        account_replication_type = cfg.sql.backup.replication;
+        min_tls_version = "TLS1_2";
+        https_traffic_only_enabled = true;
+        allow_nested_items_to_be_public = false;
+        # Deleted or overwritten backup files stay recoverable for 7 days.
+        blob_properties.delete_retention_policy.days = 7;
+        lifecycle.prevent_destroy = cfg.protectData;
+      };
+
       resource.azurerm_mssql_virtual_machine.sql = {
         inherit tags;
         virtual_machine_id = ref "azurerm_windows_virtual_machine.sql.id";
@@ -489,6 +527,15 @@ in {
           maintenance_window_duration_in_minutes = cfg.sql.autoPatching.durationMinutes;
         };
 
+        # Full + log backups, point-in-time restore within the retention.
+        # The access key lands in state, which is encrypted.
+        auto_backup = mkIf cfg.sql.backup.enable {
+          retention_period_in_days = cfg.sql.backup.retentionDays;
+          storage_blob_endpoint = ref "azurerm_storage_account.backup.primary_blob_endpoint";
+          storage_account_access_key = ref "azurerm_storage_account.backup.primary_access_key";
+          system_databases_backup_enabled = true;
+        };
+
         # The disks must be attached before the extension formats them.
         depends_on = map (n: "azurerm_virtual_machine_data_disk_attachment.${n}") (lib.attrNames cfg.disks);
 
@@ -500,6 +547,10 @@ in {
     # --- Outputs (read with `tofu output -raw public_ip`) --- #
     {
       output = {
+        backup_storage_account = mkIf cfg.sql.backup.enable {
+          value = ref "azurerm_storage_account.backup.name";
+          description = "Storage account holding the SQL backups (for a restore).";
+        };
         # sensitive: CI logs of this public repo are public.
         public_ip = {
           value = publicIp;

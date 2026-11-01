@@ -4,7 +4,7 @@ One Windows Server 2019 VM with SQL Server 2019 Web edition on Azure,
 built with [terranix](https://terranix.org) and
 [OpenTofu](https://opentofu.org). Credentials and private values live in
 1Password and are loaded by [Varlock](https://varlock.dev); the encrypted
-state lives in a private Hetzner Object Storage bucket. This repo is
+state lives in a private Azure storage account. This repo is
 public and holds no secrets.
 
 ## Use

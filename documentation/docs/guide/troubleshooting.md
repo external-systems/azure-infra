@@ -7,7 +7,7 @@ it; fix it in that phase, never by deleting state.
 |---|---|---|
 | 1. Nix evaluation | `error:` with a Nix trace, before anything runs | Typo in a `.nix` file, an unknown option, a failed assertion, a file not `git add`ed |
 | 2. Loading secrets | `error: Varlock could not load ...` | 1Password locked, wrong account/token, item or field name differs from `.env.schema` |
-| 3. `tofu init` | `Error: ... backend` | Bucket name/keys, Hetzner location, state passphrase |
+| 3. `tofu init` | `Error: ... backend` | State storage account name, service principal access, state passphrase |
 | 4. `tofu plan` | `Error:` with a resource address | Azure login or permissions, quota, region/size not available |
 | 5. `tofu apply` | `Error:` while creating/updating | Azure-side failures, SQL IaaS extension, timeouts |
 
@@ -59,9 +59,13 @@ one that failed.
 
 ## 3. `tofu init`
 
-- `NoSuchBucket` / `AccessDenied`: `sql-server-settings/state_bucket` or
-  the `hetzner-s3-state` keys are wrong, or `state.location` in
-  `settings.nix` is not the bucket's location.
+- `StorageAccountNotFound` / `ResourceNotFound` / `AuthorizationFailed`:
+  `sql-server-settings/state_storage_account` is wrong, the bootstrap
+  script did not finish (re-run it in Cloud Shell, it is safe), or the
+  service principal lost its Contributor role on the subscription.
+- `state blob is already locked`: another run is going, or one was
+  cancelled. Wait for the other run. If none is running, ask Andrew (an
+  unlock is a deliberate, approved step).
 - `decryption failed for all provided methods`: the state was written with a
   different passphrase. Someone changed `tofu-state-passphrase`. Restore the
   old value from the item's history in 1Password (item > ... > Previous

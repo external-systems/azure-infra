@@ -4,8 +4,8 @@ external-systems/azure-infra builds one Windows Server 2019 VM with SQL
 Server 2019 Web edition on Azure (network, NSG, data disks, SQL IaaS
 registration) with terranix and OpenTofu. Credentials and private values
 are in 1Password, loaded by Varlock from `.env.schema`; state is encrypted
-(OpenTofu state encryption) in a private Hetzner S3 bucket. **Public repo:
-no secret, bucket name, IP address, subscription or tenant id in any file,
+(OpenTofu state encryption) in a private Azure Storage account. **Public repo:
+no secret, state storage account name, IP address, subscription or tenant id in any file,
 commit or PR.** Load the `azure-infra` skill (`skills/azure-infra/`) for
 any task here.
 

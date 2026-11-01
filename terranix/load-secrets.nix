@@ -19,7 +19,7 @@
   eval "$varlock_env"
   unset varlock_env
 
-  # The s3 backend takes no variables: pass the private bucket name to
+  # Backends take no variables: pass the private storage account name to
   # every `tofu init` instead of committing it.
-  export TF_CLI_ARGS_init="-backend-config=bucket=$TF_STATE_BUCKET"
+  export TF_CLI_ARGS_init="-backend-config=storage_account_name=$TF_STATE_STORAGE_ACCOUNT"
 ''

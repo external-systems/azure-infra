@@ -1,14 +1,10 @@
 # Publishes the MkDocs site (with the slide deck at /slides/) to GitHub
 # Pages on every push to main. Pages source: GitHub Actions.
-#
-# Temporary: also on the first setup branch, so the getting-started guide
-# is online before the first merge. That branch must be allowed in
-# Settings > Environments > github-pages. Remove it after the merge.
 name: Docs
 
 on:
   push:
-    branches: [main, claude/sql-server-opentofu]
+    branches: [main]
   workflow_dispatch:
 
 permissions:

@@ -9,8 +9,8 @@
 # Sets up, idempotently (safe to run again):
 #   - environment azure-plan, and azure-production (main only, the given
 #     reviewers must approve every apply)
-#   - github-pages: also allows the setup branch, so docs publish before
-#     the first merge (PAGES_PREVIEW_BRANCH; empty to skip)
+#   - github-pages: optionally also allows a branch to publish the docs
+#     (PAGES_PREVIEW_BRANCH=<branch>; skipped when unset)
 #   - ruleset "protect main": pull requests only, check + plan green, no
 #     force push, no deletion
 #   - Actions: only GitHub's and DeterminateSystems' actions, read-only
@@ -24,7 +24,7 @@
 set -euo pipefail
 
 R="${REPO:-external-systems/azure-infra}"
-PAGES_PREVIEW_BRANCH="${PAGES_PREVIEW_BRANCH-claude/sql-server-opentofu}"
+PAGES_PREVIEW_BRANCH="${PAGES_PREVIEW_BRANCH:-}"
 
 if [ "$#" -lt 1 ]; then
   echo "usage: $0 <reviewer-login> [<reviewer-login> ...]" >&2

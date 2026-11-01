@@ -5,7 +5,7 @@
   azureInfra = {
     # The bucket name and the firewall allow-lists are private and live in
     # 1Password (item sql-server-settings), not here: this repo is public.
-    state.location = "fsn1";
+    state.location = "hel1";
 
     sqlServer = {
       name = "sql-web-01";

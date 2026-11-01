@@ -39,7 +39,24 @@ Write the account or token into `.env` (section 5) first: the setup
 commands below use `nix run .#op`, which needs one of them too
 (`op signin` with the desktop app, or `export OP_SERVICE_ACCOUNT_TOKEN=...`).
 
-## 2. Azure service principal
+## 2. Azure account and service principal
+
+### No Azure account yet
+
+1. Go to <https://azure.microsoft.com/free> and sign up with a Microsoft
+   account (an existing Outlook/Hotmail address works, or create one). It
+   asks for a phone number and a credit card for identity checks.
+2. The sign-up creates a **tenant** (your directory) and a free-trial
+   **subscription**. The trial has a spending limit and low quotas, so
+   upgrade it right away: portal > Subscriptions > the subscription >
+   **Upgrade** to Pay-As-You-Go. You keep any remaining free credit.
+3. Optional but wise: Cost Management > Budgets > create a monthly budget
+   with an email alert.
+4. Check the vCPU quota in your region (Subscriptions > Usage + quotas,
+   filter "Standard DSv5 Family vCPUs" and the region in `settings.nix`):
+   the default server needs 4. Request more there if it shows less.
+
+### Service principal (OpenTofu's robot login)
 
 In [Azure Cloud Shell](https://shell.azure.com) (Bash), or anywhere `az`
 is installed:

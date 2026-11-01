@@ -1,0 +1,68 @@
+/* Claude colour scheme for the deck: warm cream page, near-black text,
+   coral accents, a plain readable sans-serif. Loaded after reveal's
+   white theme. Diagrams in diagrams/ use the same colours. */
+:root {
+	--r-background-color: #faf9f5;
+	--r-main-color: #141413;
+	--r-heading-color: #141413;
+	--r-link-color: #d97757;
+	--r-link-color-hover: #c6613f;
+	--r-selection-background-color: #ebcece;
+	--r-main-font: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	--r-heading-font: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	--r-main-font-size: 38px;
+	--r-heading-font-weight: 700;
+	--r-heading-text-transform: none;
+	--r-heading-letter-spacing: -0.01em;
+}
+
+.reveal-viewport {
+	background: #faf9f5;
+}
+
+.reveal h1,
+.reveal h2 {
+	margin-bottom: 0.2em;
+}
+
+.reveal h1 {
+	font-size: 1.9em;
+}
+
+.reveal h2 {
+	font-size: 1.5em;
+}
+
+/* Underline the title in coral, like a marker stroke. */
+.reveal h1::after,
+.reveal h2::after {
+	content: "";
+	display: block;
+	width: 3.5em;
+	height: 0.12em;
+	margin: 0.25em auto 0;
+	border-radius: 0.1em;
+	background: #d97757;
+}
+
+/* One big picture per slide, no frame. */
+.reveal section img {
+	display: block;
+	margin: 0 auto;
+	max-width: 100%;
+	max-height: 780px;
+	border: none;
+	box-shadow: none;
+	background: none;
+}
+
+.reveal .slide-number {
+	background: transparent;
+	color: #87867f;
+	font-size: 22px;
+}
+
+.reveal .controls,
+.reveal .progress {
+	color: #d97757;
+}

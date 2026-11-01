@@ -25,8 +25,6 @@ on:
 
 permissions:
   contents: read
-  # FlakeHub cache (setup-nix) authenticates with GitHub OIDC.
-  id-token: write
 
 jobs:
   check:
@@ -52,7 +50,6 @@ jobs:
     environment: azure-plan
     permissions:
       contents: read
-      id-token: write
       pull-requests: write
     concurrency:
       group: plan-${{ github.ref }}
@@ -69,6 +66,15 @@ jobs:
 
       - name: Setup Nix
         uses: ./.github/actions/setup-nix
+
+      - name: Check the 1Password token is configured
+        run: |
+          if [ -z "$OP_SERVICE_ACCOUNT_TOKEN" ]; then
+            echo "::error::Secret OP_SERVICE_ACCOUNT_TOKEN is missing in environment '${ENVIRONMENT}'. See documentation/docs/guide/github-setup.md."
+            exit 1
+          fi
+        env:
+          ENVIRONMENT: azure-plan
 
       - name: tofu plan
         id: plan
@@ -140,6 +146,15 @@ jobs:
 
       - name: Setup Nix
         uses: ./.github/actions/setup-nix
+
+      - name: Check the 1Password token is configured
+        run: |
+          if [ -z "$OP_SERVICE_ACCOUNT_TOKEN" ]; then
+            echo "::error::Secret OP_SERVICE_ACCOUNT_TOKEN is missing in environment '${ENVIRONMENT}'. See documentation/docs/guide/github-setup.md."
+            exit 1
+          fi
+        env:
+          ENVIRONMENT: azure-production
 
       - name: Get the approved plan
         uses: actions/download-artifact@v5

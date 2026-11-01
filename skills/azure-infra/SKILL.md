@@ -139,6 +139,8 @@ plus a manual workflow run; see the firewall recipe in making-changes.md.
 
 | They want to... | Read |
 |---|---|
+| The big picture: goals, why OpenTofu and 1Password, what is built | [documentation/docs/big-picture.md](../../documentation/docs/big-picture.md) |
+| Remove everything (decommission, e.g. moving to Kubernetes) | Explain the steps in big-picture.md (data out and verified, final backup, then remove the safety locks and everything in one approved change). Never start it without Andrew; never run `destroy` yourself. |
 | Understand what exists and why (in plain words) | [documentation/docs/guide/azure-concepts.md](../../documentation/docs/guide/azure-concepts.md) |
 | Change something (who can connect, size, disk space, patch time) | [documentation/docs/guide/making-changes.md](../../documentation/docs/guide/making-changes.md) |
 | Know what it costs, or what a change would cost | [documentation/docs/guide/costs.md](../../documentation/docs/guide/costs.md) |

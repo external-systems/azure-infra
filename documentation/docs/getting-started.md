@@ -3,7 +3,8 @@
 From nothing to a running database server, in a web browser, about
 **2 hours**, once. You install nothing: GitHub's robot does the technical
 work. You fill in the human parts: an Azure account with your card, and a
-few codes in 1Password. Andrew has already prepared GitHub.
+few codes in 1Password. Andrew has already prepared GitHub. What this all
+is and why: [the big picture](big-picture.md).
 
 ## Easiest: let Claude guide you
 

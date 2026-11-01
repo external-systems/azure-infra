@@ -10,6 +10,7 @@ use_directory_urls: false
 
 nav:
   - Home: index.md
+  - The big picture: big-picture.md
   - Getting started: getting-started.md
   - For the operator: operator.md
   - Guide:
@@ -50,6 +51,7 @@ plugins:
 
 markdown_extensions:
   - admonition
+  - def_list
   - pymdownx.details
   - pymdownx.highlight
   - pymdownx.superfences

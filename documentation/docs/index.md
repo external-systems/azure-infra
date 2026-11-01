@@ -4,8 +4,9 @@ One server on Microsoft Azure, described as code: a Windows Server 2019
 virtual machine running **SQL Server 2019 Web edition**, with its network,
 firewall and disks. It replaces the old server at Rackspace.
 
-**New here, no Azure account, not technical?** Start with
-[Getting started](getting-started.md): everything in the browser.
+**New here?** Read [the big picture](big-picture.md) (what this is and
+why), then [Getting started](getting-started.md): everything in the
+browser.
 
 <iframe src="slides/index.html" title="Slide deck"
   style="width: 100%; aspect-ratio: 16 / 9; border: 0;"

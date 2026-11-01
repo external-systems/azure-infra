@@ -10,6 +10,11 @@ public and holds no secrets.
 Docs: <https://external-systems.github.io/azure-infra/> (start with
 [Getting started](https://external-systems.github.io/azure-infra/getting-started.html)).
 
+Goals: infrastructure as code (the files describe the server, OpenTofu
+makes Azure match), easy reviewed changes, no clicking in the Azure portal
+after the account exists, and day-to-day changes driven by the
+`azure-infra` AI skill. Overview: [the big picture](documentation/docs/big-picture.md).
+
 ## Use
 
 Changes go through pull requests; GitHub Actions plans them on the pull

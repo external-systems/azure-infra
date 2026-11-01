@@ -1,0 +1,56 @@
+site_name: azure-infra
+
+# Live preview port (devenv `docs` script / `devenv up`); 8000 is left
+# to the apps themselves.
+dev_addr: 127.0.0.1:8981
+
+# Page links as page.html instead of page/, so the static build browses
+# straight from disk: firefox result-docs/index.html
+use_directory_urls: false
+
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - For the operator: operator.md
+  - Guide:
+      - Azure concepts: guide/azure-concepts.md
+      - First-time setup: guide/first-time-setup.md
+      - Admin checklist (Andrew): guide/admin-checklist.md
+      - GitHub setup: guide/github-setup.md
+      - Making changes: guide/making-changes.md
+      - Remote Desktop: guide/remote-desktop.md
+      - Operations: guide/operations.md
+      - Costs: guide/costs.md
+      - Backups and recovery: guide/backups.md
+      - Troubleshooting: guide/troubleshooting.md
+      - Migrating from Rackspace: guide/migrating-from-rackspace.md
+  - AI assistance: ai-skill.md
+
+theme:
+  name: material
+  features:
+    - content.code.copy
+    - navigation.footer
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+plugins:
+  - search
+  # Makes search (and the rest of the site) work from file://.
+  - offline
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - tables

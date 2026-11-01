@@ -1,0 +1,11 @@
+name: Setup Nix
+description: Installs Determinate Nix
+
+# No FlakeHub cache step: this org is not registered on FlakeHub, so the
+# cache answers 401 and only slows builds down. Substitutes come from
+# cache.nixos.org.
+runs:
+  using: composite
+  steps:
+    - name: Install Nix
+      uses: DeterminateSystems/determinate-nix-action@main

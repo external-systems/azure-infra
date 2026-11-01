@@ -1,0 +1,12 @@
+result
+result-*
+.devenv*
+devenv.local.nix
+# OpenTofu working directory (providers cache, local copy of the
+# backend config). State itself lives in the Azure state storage account.
+.tofu/
+# Varlock local overrides (OP_ACCOUNT or OP_SERVICE_ACCOUNT_TOKEN).
+# .env.schema is committed and holds only op:// references.
+.env
+.env.*
+!.env.schema

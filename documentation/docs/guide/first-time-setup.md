@@ -30,10 +30,48 @@ environment of one tofu run   ARM_*, AWS_*, TF_VAR_*, TF_STATE_BUCKET
 2. Local use, recommended: the 1Password desktop app. Settings > Developer
    > "Integrate with 1Password CLI". Varlock and the OpenTofu 1Password
    provider then log in as you, with biometric unlock.
+   On NixOS, install the app and CLI with the NixOS modules (see
+   [1Password on NixOS](#1password-on-nixos) below), not from a plain
+   package.
 3. CI or a machine without the desktop app: 1Password.com > Developer >
    Service Accounts > create one with **read and write** on `azure-infra`
    (write: OpenTofu stores the generated passwords). Vault access cannot be
    changed later. Save the `ops_...` token in another vault.
+
+### 1Password on NixOS
+
+The desktop app only trusts a CLI that is setgid to the `onepassword-cli`
+group. The NixOS modules install exactly that wrapper
+(`/run/wrappers/bin/op`); the tofu wrapper and `env-check` use it when it
+exists. In the machine's NixOS configuration:
+
+```nix
+{
+  nixpkgs.config.allowUnfreePredicate = pkg:
+    builtins.elem (lib.getName pkg) ["1password" "1password-cli"];
+
+  programs = {
+    _1password.enable = true; # op, as the setgid wrapper
+    _1password-gui = {
+      enable = true;
+      polkitPolicyOwners = ["andrew"]; # your user: system-auth unlock
+    };
+  };
+}
+```
+
+Then rebuild, start 1Password, sign in, and:
+
+1. Settings > Security: "Unlock using system authentication" on (password
+   prompt via polkit; fingerprint if `services.fprintd.enable = true` and
+   enrolled).
+2. Settings > Developer: "Integrate with 1Password CLI" on.
+3. Test: `op vault list` (the app asks to authorize, then lists vaults),
+   then `env-check` in the repo.
+
+Do not also install `_1password-cli` in `home.packages` or
+`environment.systemPackages`: an unwrapped `op` earlier on `PATH` fails
+with "connecting to desktop app" errors.
 
 Write the account or token into `.env` (section 5) first: the setup
 commands below use `nix run .#op`, which needs one of them too

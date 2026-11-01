@@ -48,6 +48,10 @@ one that failed.
 - Desktop app: the app must be running and unlocked, with Settings >
   Developer > "Integrate with 1Password CLI" on, and `OP_ACCOUNT` in `.env`
   set to an account from `op account list`.
+- NixOS, "connecting to desktop app" or the app never asks to authorize:
+  `op` must be the setgid wrapper from `programs._1password`
+  (`which op` shows `/run/wrappers/bin/op`). See
+  [1Password on NixOS](first-time-setup.md#1password-on-nixos).
 - Service account: token in `.env` as `OP_SERVICE_ACCOUNT_TOKEN`, and the
   account must have access to the `azure-infra` vault (fixed at creation).
 - `bunx` cannot download Varlock: needs internet access to the npm

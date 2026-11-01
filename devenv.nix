@@ -22,8 +22,9 @@ in {
       description = "Any other OpenTofu command, with credentials loaded (e.g. tofu output)";
     };
     env-check = {
-      # op on PATH for the desktop app login, as in the tofu wrapper.
-      exec = ''PATH="$(nix build --no-link --print-out-paths .#op)/bin:$PATH" ${varlock} load "$@"'';
+      # op on PATH for the desktop app login, as in the tofu wrapper
+      # (NixOS: the setgid wrapper first, the app rejects any other op).
+      exec = ''PATH="/run/wrappers/bin:$(nix build --no-link --print-out-paths .#op)/bin:$PATH" ${varlock} load "$@"'';
       description = "Resolve .env.schema through 1Password and show the result, secrets redacted";
     };
   };

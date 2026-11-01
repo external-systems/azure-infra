@@ -4,6 +4,12 @@
 {varlockVersion}: ''
   REPO_ROOT="$(git rev-parse --show-toplevel)"
 
+  # NixOS (programs._1password): the desktop app only talks to the setgid
+  # op wrapper, not the plain op from the Nix store. Prefer it when present.
+  if [ -x /run/wrappers/bin/op ]; then
+    export PATH="/run/wrappers/bin:$PATH"
+  fi
+
   if ! varlock_env="$(bunx "varlock@${varlockVersion}" load --format shell --path "$REPO_ROOT/")"; then
     echo "error: Varlock could not load .env.schema from 1Password." >&2
     echo "Unlock the 1Password app (OP_ACCOUNT) or set OP_SERVICE_ACCOUNT_TOKEN in .env." >&2

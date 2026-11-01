@@ -31,7 +31,7 @@ this page on your own: the steps are the same.
     key, secret or token. Those go only into 1Password. The project is
     public: anyone on the internet can read it.
 
-Nothing on this page can break anything until the step 7 build, and even
+Nothing on this page can break anything until the step 6 build, and even
 that waits for your "yes". Stuck? Ask Claude or Andrew.
 
 ## What you will need
@@ -45,6 +45,10 @@ that waits for your "yes". Stuck? Ask Claude or Andrew.
 - [ ] A **GitHub** account (free, <https://github.com/signup>). Andrew adds
       you to this project as **Admin**.
 
+Andrew has already prepared the GitHub side (safety settings, the robot's
+rooms, who may approve). Your part is the Azure account, the codes, and
+saying "yes".
+
 ## The big picture
 
 | Step | What | Like... |
@@ -54,9 +58,8 @@ that waits for your "yes". Stuck? Ask Claude or Andrew.
 | 3 | Paste one line in Azure | Making the robot's key card and its notebook |
 | 4 | Two more entries in 1Password | A secret code and a short list of settings |
 | 5 | Give GitHub's robot a key to the safe | Handing the robot the drawer key |
-| 6 | Lock the GitHub project | Only your people can make changes |
-| 7 | Build the server | Pressing "go" and saying "yes" |
-| 8 | Let developers in, and talk to Claude | From now on, just ask |
+| 6 | Build the server | Pressing "go" and saying "yes" |
+| 7 | Let developers in, and talk to Claude | From now on, just ask |
 
 ??? info "Behind the scenes: how the whole thing works"
     The project on GitHub is a **written description** of the server: what
@@ -229,7 +232,7 @@ Both in vault `azure-infra`.
 3. Your home internet address: open <https://ifconfig.me> **at home**. It
    shows something like `203.0.113.7`. Type it with `/32` at the end:
    `203.0.113.7/32`. Leave the field empty if nobody needs to log in to
-   the server's screen yet; developers are added later (step 8).
+   the server's screen yet; developers are added later (step 7).
 
 Done when: the `azure-infra` vault has these three items:
 `azure-service-principal`, `tofu-state-passphrase`, `sql-server-settings`.
@@ -265,82 +268,34 @@ Vault access cannot be changed later; if you got it wrong, delete the
 service account and make it again. If you do not see "Developer" or
 "Service Accounts", ask Andrew.
 
-**B. Give the keys to GitHub.** Open the project:
-<https://github.com/external-systems/azure-infra>, then **Settings** (the
-gear tab at the top of the project; you need Admin, ask Andrew).
+**B. Give the keys to GitHub.** Andrew already made two "rooms" for the
+robot (GitHub calls them environments). You put one key in each:
 
-1. Left menu: **Environments** > **New environment**. Name: `azure-plan`.
-   **Configure environment**.
-2. Under **Environment secrets** click **Add environment secret**. Name:
-   `OP_SERVICE_ACCOUNT_TOKEN`. Value: paste the `azure-infra-plan` token.
-   **Add secret**.
-3. Back to **Environments** > **New environment**. Name:
-   `azure-production`. **Configure environment**.
-4. Tick **Required reviewers**, add yourself (and Andrew), and click
-   **Save protection rules**. Now nothing changes in Azure until one of you
-   clicks "Approve".
-5. **Deployment branches and tags**: choose **Selected branches and tags**,
-   **Add deployment branch or tag rule**, type `main`, **Add rule**.
-6. **Add environment secret**: name `OP_SERVICE_ACCOUNT_TOKEN`, value the
-   `azure-infra-apply` token. **Add secret**.
+1. Open <https://github.com/external-systems/azure-infra/settings/environments>
+   (the project's **Settings** > **Environments**).
+2. Click **azure-plan**. Under **Environment secrets** click **Add
+   environment secret**. Name: `OP_SERVICE_ACCOUNT_TOKEN`. Value: paste the
+   `azure-infra-plan` token (open it in 1Password, copy). **Add secret**.
+3. Go back, click **azure-production**, and do the same with the
+   `azure-infra-apply` token.
 
-Done when: **Environments** lists `azure-plan` and `azure-production`, each
-with one secret.
+Done when: `azure-plan` and `azure-production` each show one secret,
+`OP_SERVICE_ACCOUNT_TOKEN`. GitHub never shows a secret again, not even to
+you. If you pasted the wrong one, click it and **Update** it.
+
+If you do not see **Settings** or **Environments**, ask Andrew.
 
 ??? info "Behind the scenes"
     An **environment** is a locked room the robot works in. The token is
     the only key GitHub ever holds; GitHub keeps it hidden and gives it only
     to jobs in that room. Previews (plans) run in `azure-plan` with the
     look-only key. Real changes run in `azure-production`, only from the
-    `main` branch, and only after a required reviewer approves, with the key
-    that may also save passwords.
+    `main` branch, and only after a required reviewer (you or Andrew)
+    approves, with the key that may also save passwords. Andrew also locked
+    the project so only your people can change it and strangers can never
+    use the robot ([details](guide/github-setup.md)).
 
-## Step 6: Lock the GitHub project
-
-The project is public: anyone can read it. These settings make sure only
-your people can change it, and that strangers can never use your robot.
-All in the project's **Settings**.
-
-**A. Protect the main version** (Settings > **Rules** > **Rulesets**):
-
-1. **New ruleset** > **New branch ruleset**.
-2. Ruleset name: `protect main`. Enforcement status: **Active**.
-3. Target branches: **Add target** > **Include default branch**.
-4. Tick: **Restrict deletions**, **Require a pull request before
-   merging** (required approvals: `0`), **Require status checks to pass**
-   (tick "Require branches to be up to date"; click **Add checks** and add
-   `check` and `plan`), and **Block force pushes**.
-5. **Create**.
-
-**B. Control the robot** (Settings > **Actions** > **General**):
-
-1. Actions permissions: **Allow ... and select non-... actions**. Tick
-   **Allow actions created by GitHub**, and in the box below type
-   `DeterminateSystems/*`.
-2. Approval for running fork pull request workflows: **Require approval
-   for all external contributors**.
-3. Workflow permissions: **Read repository contents and packages
-   permissions**. Untick **Allow GitHub Actions to create and approve pull
-   requests**.
-4. **Save** under each section.
-
-**C. Keep strangers out** (Settings > **Moderation options** >
-**Interaction limits**): choose **Limit to repository collaborators**, for
-**6 months**. Put a reminder in your calendar to renew it.
-
-**D. Who may make changes** (Settings > **Collaborators and teams**): only
-you and Andrew (Admin), and anyone else Andrew says (Write). Developers who
-only need Remote Desktop do **not** need GitHub access.
-
-??? info "Behind the scenes"
-    `main` is the official version of the description; the robot builds
-    from it. With the ruleset, every change has to be a **pull request** (a
-    proposed change) whose checks and preview passed. Pull requests from
-    strangers' copies ("forks") never get the robot's keys, and the
-    interaction limit stops strangers from even opening one. Details for
-    Andrew: [GitHub setup](guide/github-setup.md).
-
-## Step 7: Build the server
+## Step 6: Build the server
 
 1. On GitHub, open the project and click **Actions** (top).
 2. On the left click **Infrastructure**. On the right click **Run
@@ -374,7 +329,7 @@ or Andrew.
     already exists. You can look at all of it in the Azure portal: search
     **Resource groups** > `rg-sql-web-01`.
 
-## Step 8: Let developers in, and talk to Claude
+## Step 7: Let developers in, and talk to Claude
 
 **Developers** connect to the server with Remote Desktop. To let one in,
 you add their internet address and share the logins vault:
@@ -393,7 +348,7 @@ you add their internet address and share the logins vault:
 
 Claude makes a proposal, shows you what would change, what it costs, and
 whether the database goes offline, and only continues when you say
-**yes**. At the end, you click **Approve** on GitHub (like step 7.5).
+**yes**. At the end, you click **Approve** on GitHub (like step 6.5).
 More about this: [For the operator](operator.md).
 
 ## Words you might see

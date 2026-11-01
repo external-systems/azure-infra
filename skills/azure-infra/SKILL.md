@@ -37,7 +37,7 @@ If the server does not exist yet (they say "get started", "set up",
 "I have no Azure account", or the vaults/environments are missing), you are
 their guide through
 [documentation/docs/getting-started.md](../../documentation/docs/getting-started.md)
-(8 steps). Everything happens in their browser; you cannot click in Azure,
+(7 steps). Everything happens in their browser; you cannot click in Azure,
 1Password or GitHub settings for them, so you tell them exactly what to
 click. The same page is online: <https://external-systems.github.io/azure-infra/getting-started.html>;
 give them that link if they want to read along.
@@ -55,10 +55,14 @@ give them that link if they want to read along.
   If they paste one anyway: tell them calmly, and have them make a new one
   (step 3: paste the setup line again; step 5: delete and recreate that
   service account) and update 1Password.
-- **Steps 5 and 6 need Admin on the GitHub repo.** If they cannot see
-  **Settings** on the repo, stop and ask Andrew to make them Admin (or to
-  do those steps).
-- **Step 7 (first build):** you may start Actions > Infrastructure > Run
+- **Andrew prepares GitHub first** (admin checklist,
+  [documentation/docs/guide/admin-checklist.md](../../documentation/docs/guide/admin-checklist.md)):
+  environments, reviewers, ruleset, Actions lockdown, and the merge of the
+  setup PR. The operator only does Azure, 1Password and pasting the two
+  tokens (step 5). If `azure-plan`/`azure-production` do not exist, or they
+  cannot see **Settings**, stop and ask Andrew; do not walk them through
+  repository settings.
+- **Step 6 (first build):** you may start Actions > Infrastructure > Run
   workflow on `main` for them if you have a tool for it; otherwise guide
   them. Read the `plan` job's output and explain it: a first build is
   only `+` (about 17 resources), roughly $385 a month
@@ -70,7 +74,7 @@ give them that link if they want to read along.
 - After the first build: show them where the server's address and
   passwords are (1Password vault `azure-infra-logins`, items
   `sql-web-01 Windows admin` and `sql-web-01 SQL login`; OpenTofu created
-  and saved them there), then step 8: developers' Remote Desktop access
+  and saved them there), then step 7: developers' Remote Desktop access
   ([remote-desktop.md](../../documentation/docs/guide/remote-desktop.md))
   and how future changes work (below).
 
@@ -144,7 +148,7 @@ plus a manual workflow run; see the firewall recipe in making-changes.md.
 | Fix a failed check, plan or apply | [documentation/docs/guide/troubleshooting.md](../../documentation/docs/guide/troubleshooting.md) |
 | Move the databases from Rackspace | [documentation/docs/guide/migrating-from-rackspace.md](../../documentation/docs/guide/migrating-from-rackspace.md) |
 | Set up everything from zero, browser only (no Azure account yet) | [documentation/docs/getting-started.md](../../documentation/docs/getting-started.md): walk them through it one step at a time |
-| Set up GitHub, 1Password, Azure the first time (Andrew's job) | [documentation/docs/guide/github-setup.md](../../documentation/docs/guide/github-setup.md), [documentation/docs/guide/first-time-setup.md](../../documentation/docs/guide/first-time-setup.md) |
+| Set up GitHub, 1Password, Azure the first time (Andrew's job) | [documentation/docs/guide/admin-checklist.md](../../documentation/docs/guide/admin-checklist.md), [documentation/docs/guide/github-setup.md](../../documentation/docs/guide/github-setup.md), [documentation/docs/guide/first-time-setup.md](../../documentation/docs/guide/first-time-setup.md) |
 
 ## How to explain a plan
 

@@ -8,6 +8,12 @@ They are settings, not files, so they are not in the repo.
 
 `OWNER/REPO` below is `external-systems/azure-infra`.
 
+**Shortcut:** `scripts/github-setup.sh <your-login> <operator-login>` does
+sections 2 (without the secrets), 3, 4 and the interaction limit from 5 in
+one run. The order of everything to do before the operator starts is in
+the [admin checklist](admin-checklist.md). The sections below explain each
+setting.
+
 ## How the pipeline works
 
 ```

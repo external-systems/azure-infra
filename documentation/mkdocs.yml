@@ -15,6 +15,7 @@ nav:
   - Guide:
       - Azure concepts: guide/azure-concepts.md
       - First-time setup: guide/first-time-setup.md
+      - Admin checklist (Andrew): guide/admin-checklist.md
       - GitHub setup: guide/github-setup.md
       - Making changes: guide/making-changes.md
       - Remote Desktop: guide/remote-desktop.md

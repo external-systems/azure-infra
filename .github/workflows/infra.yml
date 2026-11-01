@@ -55,7 +55,7 @@ jobs:
       group: plan-${{ github.ref }}
       cancel-in-progress: true
     outputs:
-      changes: ${{ steps.plan.outputs.changes }}
+      changes: ${{ steps.plan.outputs.changes || 'false' }}
     env:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
     steps:
@@ -67,17 +67,33 @@ jobs:
       - name: Setup Nix
         uses: ./.github/actions/setup-nix
 
+      # Before first-time setup there is no token: skip the plan (green, so
+      # docs-only pull requests can merge) instead of failing. Without a
+      # token nothing can reach Azure, and apply cannot run either.
       - name: Check the 1Password token is configured
+        id: token
         run: |
           if [ -z "$OP_SERVICE_ACCOUNT_TOKEN" ]; then
-            echo "::error::Secret OP_SERVICE_ACCOUNT_TOKEN is missing in environment '${ENVIRONMENT}'. See documentation/docs/guide/github-setup.md."
-            exit 1
+            echo "::warning::Plan skipped: secret OP_SERVICE_ACCOUNT_TOKEN is not set in environment 'azure-plan' yet (getting-started step 5)."
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Note the skipped plan on the pull request
+        if: steps.token.outputs.configured == 'false' && github.event_name == 'pull_request'
         env:
-          ENVIRONMENT: azure-plan
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          printf '%s\n' "## OpenTofu plan" "" \
+            "**Skipped: 1Password is not connected yet** (no \`OP_SERVICE_ACCOUNT_TOKEN\` in the \`azure-plan\` environment). Nothing can change in Azure until it is; see getting-started step 5." \
+            > plan.md
+          gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body-file plan.md --edit-last --create-if-none
 
       - name: tofu plan
         id: plan
+        if: steps.token.outputs.configured == 'true'
         run: |
           set +e
           nix run .#sql-server.plan -- -input=false -no-color -detailed-exitcode -out=tfplan
@@ -91,6 +107,7 @@ jobs:
           esac
 
       - name: Write plan summary
+        if: steps.token.outputs.configured == 'true'
         run: |
           nix run .#tofu -- show -no-color tfplan > plan.txt
           {
@@ -111,7 +128,7 @@ jobs:
           cat plan.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Post plan on the pull request
-        if: github.event_name == 'pull_request'
+        if: steps.token.outputs.configured == 'true' && github.event_name == 'pull_request'
         env:
           GH_TOKEN: ${{ github.token }}
           PR: ${{ github.event.pull_request.number }}
@@ -120,7 +137,7 @@ jobs:
       # The plan file is encrypted (OpenTofu plan encryption, enforced), so it
       # is safe to keep as an artifact for the apply job.
       - name: Keep plan for apply
-        if: github.event_name != 'pull_request' && steps.plan.outputs.changes == 'true'
+        if: steps.token.outputs.configured == 'true' && github.event_name != 'pull_request' && steps.plan.outputs.changes == 'true'
         uses: actions/upload-artifact@v5
         with:
           name: tfplan

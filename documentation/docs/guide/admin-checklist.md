@@ -36,8 +36,8 @@ Do these in order.
 - [ ] **Merge the setup pull request** into `main`. Step 3 of getting
       started downloads `scripts/azure-bootstrap.sh` from `main`, and
       Actions only offers **Run workflow** for workflows on `main`. Before
-      the tokens exist, the merge changes nothing in Azure: `plan` fails at
-      "Check the 1Password token is configured" and `apply` never runs.
+      the tokens exist, the merge changes nothing in Azure: `plan` is skipped
+      (green, with a warning) and `apply` never runs.
 - [ ] **Send the operator the link**:
       <https://external-systems.github.io/azure-infra/getting-started.html>.
       They start Claude at claude.ai/code and say "Help me get started".

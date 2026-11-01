@@ -40,8 +40,9 @@ that waits for your "yes". Stuck? Ask Claude or Andrew.
 - [ ] An email address and your phone (for codes)
 - [ ] A credit card (Azure checks your identity with it, and bills it
       monthly, about $385; see [costs](guide/costs.md))
-- [ ] A **1Password** account (the password manager). Andrew invites you
-      to the family or team account.
+- [ ] Your company's **1Password Business** account (the password
+      manager), with permission to create vaults and service accounts (an
+      owner or administrator of that account has it).
 - [ ] A **GitHub** account (free, <https://github.com/signup>). Andrew adds
       you to this project as **Admin**.
 
@@ -83,6 +84,9 @@ saying "yes".
 
 Done when: you see two empty vaults, `azure-infra` and
 `azure-infra-logins`.
+
+Then let Andrew in: open each vault > **People** (or **Manage access**) >
+add Andrew. He uses it to help and to fix problems.
 
 ??? info "Behind the scenes: why two?"
     `azure-infra` holds the keys to Azure itself: only you, Andrew and the
@@ -266,7 +270,9 @@ passwords (for real changes).
 
 Vault access cannot be changed later; if you got it wrong, delete the
 service account and make it again. If you do not see "Developer" or
-"Service Accounts", ask Andrew.
+"Service Accounts", your 1Password role may not allow it: ask the
+company's 1Password owner to give you the Administrators role (or to do
+this part), or ask Andrew.
 
 **B. Give the keys to GitHub.** Andrew already made two "rooms" for the
 robot (GitHub calls them environments). You put one key in each:

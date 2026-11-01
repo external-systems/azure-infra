@@ -10,10 +10,12 @@ Do these in order.
 - [ ] **Invite the operator to GitHub**: Settings > Collaborators > Add
       people, role **Admin** (needed to paste the two tokens and to approve
       applies).
-- [ ] **Invite the operator to 1Password**: the same 1Password account
-      (family or team) as you, so you can both see the `azure-infra`
-      vaults. Service accounts must be available on that plan
-      (Developer > Service Accounts).
+- [ ] **1Password**: the vaults live in the operator's company **1Password
+      Business** account (they create them in step 1 and add you to both).
+      Make sure they can create vaults and service accounts there (owner or
+      Administrators role); if not, the company's 1Password owner grants it
+      or does step 5A. For local runs you need a seat in that account:
+      `OP_ACCOUNT` is its sign-in address.
 - [ ] **Install the Claude GitHub App** on this repo
       (<https://github.com/apps/claude>), so Claude in the browser
       (claude.ai/code) can open pull requests for the operator.

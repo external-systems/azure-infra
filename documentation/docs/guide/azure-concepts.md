@@ -12,7 +12,7 @@ person; avoid unexplained jargon.
 | **Subscription** | The billing account. Everything here is billed to one subscription. |
 | **Service principal** | A robot user. OpenTofu logs in as one (`azure-service-principal` in 1Password) with the *Contributor* role on the subscription: it may create and delete resources but not manage permissions. |
 | **Resource group** | A folder for resources (`rg-sql-web-01`). Deleting it deletes everything inside. |
-| **Region / location** | The data center area (`eastus2`). Pick one close to the users and the web servers. Moving region means rebuilding. |
+| **Region / location** | The data center area (`southcentralus`, San Antonio, Texas). Pick one close to the users and the web servers. Moving region means rebuilding. |
 
 ## Network
 

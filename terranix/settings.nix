@@ -9,7 +9,7 @@
 
     sqlServer = {
       name = "sql-web-01";
-      location = "eastus2";
+      location = "southcentralus";
       vm.size = "Standard_D4s_v5";
 
       sql.connectivity = "PRIVATE";

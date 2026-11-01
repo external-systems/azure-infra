@@ -82,7 +82,7 @@ in {
     };
     location = mkOption {
       type = types.str;
-      default = "eastus2";
+      default = "southcentralus";
       description = "Azure region (`az account list-locations -o table`). Changing it replaces everything.";
     };
     resourceGroupName = mkOption {

@@ -29,7 +29,7 @@ terranix/settings.nix --(Nix, terranix)--> config.tf.json --(OpenTofu)--> Azure
 
 | Piece | Default |
 |---|---|
-| Region | `eastus2` |
+| Region | `southcentralus` (San Antonio, Texas) |
 | VM | `Standard_D4s_v5` (4 vCPU, 16 GiB), Windows Server 2019 + SQL Server 2019 Web, SQL license paid per hour |
 | Disks | C: 127 GiB, F: data 256 GiB, G: log 128 GiB (Premium SSD); tempdb on the local D: |
 | Network | Private network `10.50.0.0/16`, static public IP |

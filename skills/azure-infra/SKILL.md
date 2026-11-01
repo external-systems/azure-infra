@@ -80,6 +80,7 @@ Details for each step: [documentation/docs/guide/making-changes.md](../../docume
 | `.github/workflows/infra.yml` | The check, plan and apply robot | Never |
 | `.github/workflows/docs.yml` | Publishes the docs website | Never |
 | `documentation/docs/guide/` | The detailed guides (people and you read the same pages) | Keep in step with changes |
+| `documentation/docs/guide/costs.md` | Monthly cost estimate for the current settings | Yes: in the same PR as any size, disk, region or image change |
 
 Firewall IP addresses are **not** in the repo (it is public). They are in
 1Password, item `sql-server-settings`. Changing them is a 1Password edit
@@ -91,7 +92,8 @@ plus a manual workflow run; see the firewall recipe in making-changes.md.
 |---|---|
 | Understand what exists and why (in plain words) | [documentation/docs/guide/azure-concepts.md](../../documentation/docs/guide/azure-concepts.md) |
 | Change something (who can connect, size, disk space, patch time) | [documentation/docs/guide/making-changes.md](../../documentation/docs/guide/making-changes.md) |
-| Know costs, passwords, updates, backups | [documentation/docs/guide/operations.md](../../documentation/docs/guide/operations.md) |
+| Know what it costs, or what a change would cost | [documentation/docs/guide/costs.md](../../documentation/docs/guide/costs.md) |
+| Know passwords, updates, backups | [documentation/docs/guide/operations.md](../../documentation/docs/guide/operations.md) |
 | Fix a failed check, plan or apply | [documentation/docs/guide/troubleshooting.md](../../documentation/docs/guide/troubleshooting.md) |
 | Move the databases from Rackspace | [documentation/docs/guide/migrating-from-rackspace.md](../../documentation/docs/guide/migrating-from-rackspace.md) |
 | Set up GitHub, 1Password, Azure the first time (Andrew's job) | [documentation/docs/guide/github-setup.md](../../documentation/docs/guide/github-setup.md), [documentation/docs/guide/first-time-setup.md](../../documentation/docs/guide/first-time-setup.md) |
@@ -109,9 +111,12 @@ Translate each resource line into one plain sentence, then the summary:
 | `(sensitive value)` | "Hidden on purpose because the page is public; it's the IP list or a password." |
 | `-` or `-/+` on the VM, disks or resource group | "This would delete the server or its data. I don't recommend it." Then stop. |
 
-Prices: Azure's pricing changes, so give direction and rough size ("about
-twice the current server cost") and point to Cost Management in the Azure
-portal, or ask Andrew, rather than quoting exact numbers.
+Prices: use the estimate and the "What changes the cost" table in
+[costs.md](../../documentation/docs/guide/costs.md), as rough numbers
+("about $380 a month now; this makes it about $240"). Any change to region,
+VM size, image, disks or public IP also updates costs.md in the same pull
+request, and the PR description says how the monthly total changes. For the
+real bill, point to Cost Management in the Azure portal.
 
 ## Hard rules
 

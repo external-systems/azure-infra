@@ -21,13 +21,18 @@ make the smallest edit that does it, commit with a message that says why.
 Never edit `.github/`, never put a password, key, bucket name or IP address
 in a file.
 
+If the change touches the region, VM size, image, disks or public IP, also
+update [costs](costs.md) (tables, total, "Last checked" date) in the same
+branch.
+
 Locally, with the devenv shell, also run `fmt` and `check`. In the browser
 there is nothing to run: CI's `check` job does the same.
 
 ### 3. Open the pull request
 
 Push the branch and open a pull request to `main`. Write the description
-for the operator, in plain words: what changes, what it costs, whether the
+for the operator, in plain words: what changes, how the monthly cost
+changes (from [costs](costs.md)), whether the
 database goes offline. No IPs or secrets: the repo and its pull requests
 are public.
 

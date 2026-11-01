@@ -31,16 +31,13 @@ Lost the admin password: reset it as above; nothing in OpenTofu changes.
 
 ## Costs
 
-Running cost is the VM size (per hour, SQL Web license included), the
-three Premium SSDs, and the public IP. Check in the portal: Cost
-Management, filter by resource group `rg-<name>` or tag
-`managed-by = azure-infra`.
+The monthly estimate, what changes it and how to save are in
+[costs](costs.md). The real bill is in the portal: Cost Management,
+filtered by resource group `rg-<name>` or tag `managed-by = azure-infra`.
 
 - Stop paying for compute: `az vm deallocate -g rg-<name> -n vm-<name>`
   (disks and IP are still billed; a plain shutdown inside Windows is still
   billed). Start: `az vm start ...`. OpenTofu does not track power state.
-- Cheaper long-term: Azure reservations or savings plans for the VM, bought
-  in the portal; nothing changes in this repo.
 
 ## Backups
 

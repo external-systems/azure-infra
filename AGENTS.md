@@ -35,4 +35,5 @@ any task here.
 - Never run `apply`, `destroy`, `state rm`, `import` or `force-unlock` without the person's explicit go-ahead for that command.
 - Never print secret values; `env-check` shows them redacted.
 - Keep `documentation/docs/guide/` and `skills/azure-infra/SKILL.md` in step with code changes.
+- Keep `documentation/docs/guide/costs.md` in step with the configuration: any change to region, VM size, image/licensing, disks or public IP updates its tables, totals and "Last checked" date in the same PR, and the PR description states the monthly cost change.
 - Work on a branch and open a PR. Never push to `main`.

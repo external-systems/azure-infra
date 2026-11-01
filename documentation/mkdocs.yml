@@ -49,6 +49,10 @@ plugins:
   # Makes search (and the rest of the site) work from file://.
   - offline
 
+# The diagrams link to ../slides/diagrams; their generator is not a page.
+exclude_docs: |
+  diagrams/generate.mjs
+
 markdown_extensions:
   - admonition
   - def_list

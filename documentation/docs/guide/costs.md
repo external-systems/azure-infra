@@ -25,6 +25,8 @@ Last checked: **2026-11-01**. List prices, pay-as-you-go, USD.
 
 ## Monthly estimate
 
+![About $385 a month: server and Windows $275, SQL license $25, disks $78, backups and address $9](../diagrams/cost.svg)
+
 | Item | How it is billed | Approx. / month |
 |---|---|---|
 | VM compute + Windows license (`Standard_D4s_v5`, ~$0.376/h) | per hour while running | ~$275 |

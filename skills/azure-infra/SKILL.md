@@ -127,7 +127,7 @@ Details for each step: [documentation/docs/guide/making-changes.md](../../docume
 | `.github/workflows/infra.yml` | The check, plan and apply robot | Never |
 | `.github/workflows/docs.yml` | Publishes the docs website | Never |
 | `documentation/docs/guide/` | The detailed guides (people and you read the same pages) | Keep in step with changes |
-| `documentation/docs/guide/costs.md` | Monthly cost estimate for the current settings | Yes: in the same PR as any size, disk, region or image change |
+| `documentation/docs/guide/costs.md` | Monthly cost estimate for the current settings | Yes: in the same PR as any size, disk, region or image change, with the cost diagram in `documentation/slides/diagrams/generate.mjs` |
 
 Firewall IP addresses are **not** in the repo (it is public). They are in
 1Password, vault `azure-infra`, item `sql-server-settings`. The generated

@@ -1,111 +1,77 @@
-# azure-infra
+# Our database server, moving to Azure
 
-One SQL Server on Azure, built from code
+![The old server at Rackspace moves to Microsoft Azure in San Antonio, Texas](diagrams/move.svg)
 
-Note: Press `S` for the speaker view, `F` for fullscreen. Audience: people who will change this server with an AI agent and have never used Azure.
-
----
-
-## Why
-
-- The database server lives at Rackspace today
-- Moving to Azure: Windows Server 2019 + SQL Server 2019 **Web**
-- No clicking in the portal: the server is described in files, reviewed in PRs
+Note: Press S for the speaker view, F for fullscreen, arrow keys to move. One picture per slide; the notes say it in words.
 
 ---
 
-## What gets built
+## Written down, not clicked
 
-- One VM (`Standard_D4s_v5`: 4 vCPU, 16 GiB)
-- Disks: C: Windows, F: data, G: logs, D: tempdb (temporary)
-- A private network, a static public IP, a closed firewall
-- Two logins, passwords generated into 1Password
+![Clicking by hand is forgotten and error-prone; a written blueprint is previewed, recorded and repeatable](diagrams/blueprint.svg)
 
---
+Note: The whole server is described in a file. A program called OpenTofu (the robot) makes Azure match the description. Every change is previewed first and kept in history.
 
-## Azure in one slide
+---
 
-| Azure word | Means |
-|---|---|
-| Subscription | the bill |
-| Resource group | a folder of resources |
-| VNet / subnet | our private network |
-| NSG | the firewall |
-| SQL IaaS extension | license, disks, patching for SQL |
+## What we get
+
+![Developers pass a firewall to reach the server, which has three disks and sends backups to storage](diagrams/built.svg)
+
+Note: One Windows server with SQL Server, three disks, a firewall that only lets in people on the list, and automatic backups kept 30 days with a copy far away.
 
 ---
 
 ## How a change happens
 
-```
-ask Claude -> pull request -> plan on the PR -> yes -> merge -> Approve -> apply
-```
+![You ask, Claude prepares, GitHub shows a preview, you approve, the robot builds it in Azure](diagrams/change.svg)
 
-1. Claude edits a file on a branch
-2. GitHub plans it: nothing changes yet
-3. You say yes, Claude merges
-4. A reviewer clicks Approve, GitHub applies it
+Note: Nothing changes until you click Approve. Saying no, or asking Andrew, is always safe.
 
 ---
 
-## Reading a plan
+## Where the keys live
 
-| Symbol | Meaning |
-|---|---|
-| `+` | create |
-| `~` | change in place |
-| `-/+` | **replace** (delete, recreate) |
-| `-` | **destroy** |
+![1Password holds the keys to Azure and the server passwords; the robot reads keys and saves passwords; developers get the passwords](diagrams/keys.svg)
 
-Note: Any minus on the VM, a disk or the resource group means data loss. The repo refuses those by default (protectData).
+Note: Passwords never go into GitHub, email or chat. The project is public. Nobody needs to type or remember the server passwords.
 
 ---
 
-## Secrets
+## Backups, automatically
 
-- Public repo: no passwords, keys, account names or IPs in it
-- `.env.schema` holds only `op://` references
-- Varlock + 1Password plugin load them for each tofu run
-- Desktop app with biometric unlock, or a service account in CI
+![The database is backed up automatically to storage in Texas, kept 30 days, with a copy in Illinois](diagrams/backups.svg)
 
---
-
-## The state
-
-- OpenTofu's memory of what it built
-- Contains the server passwords, so it is **encrypted**
-- Stored in a private Azure storage account, locked during applies
-- Never delete it, never change its passphrase
+Note: If something goes wrong, the database can be brought back as it was at almost any minute in the last 30 days.
 
 ---
 
-## Working with the AI agent
+## Letting a developer in
 
-- The `azure-infra` skill ships in the repo
-- Ask in plain words: "open RDP for my IP"
-- The agent edits, opens a PR, explains GitHub's plan
-- You decide: merge, then Approve
+![A developer passes the firewall guest list to reach the server, logging in with a password from 1Password](diagrams/remote.svg)
 
----
-
-## Common changes
-
-- Firewall IPs: edit `sql-server-settings` in 1Password, Run workflow
-- Bigger VM: `vm.size` (restarts once)
-- Bigger disk: `disks.data.sizeGb`, then extend F: in Windows
-- Patch window: `sql.autoPatching`
+Note: Add the developer's internet address to the guest list, approve, and share the logins vault with them. Claude walks you through it.
 
 ---
 
-## Next steps
+## Just ask Claude
 
-1. First-time setup (1Password, Azure)
-2. First `apply`
-3. Rehearse the database move
-4. Cutover, then backups
+![Ask Claude in plain words: add a developer, more disk space, restore a backup, remove it all](diagrams/ask.svg)
+
+Note: Open claude.ai/code, pick the azure-infra project, and ask in your own words. Claude explains what would change, the cost, and waits for your yes.
 
 ---
 
-# Questions?
+## Your part
 
-Docs: the GitHub Pages site of this repo
+![Your three jobs: make the Azure account, put the codes in 1Password, click Approve](diagrams/your-part.svg)
+
+Note: The step-by-step guide is "Getting started" in the documentation website. Claude can walk you through it.
+
+---
+
+## What it costs
+
+![About $385 a month: server and Windows $275, SQL license $25, disks $78, backups and address $9](diagrams/cost.svg)
+
+Note: The documentation's Costs page has the details and is kept up to date with the setup.

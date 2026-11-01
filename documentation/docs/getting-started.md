@@ -6,6 +6,8 @@ work. You fill in the human parts: an Azure account with your card, and a
 few codes in 1Password. Andrew has already prepared GitHub. What this all
 is and why: [the big picture](big-picture.md).
 
+![Your three jobs: make the Azure account, put the codes in 1Password, click Approve](diagrams/your-part.svg)
+
 ## Easiest: let Claude guide you
 
 1. Open <https://claude.ai/code>, sign in, and **Connect GitHub** when asked.
@@ -171,6 +173,8 @@ vault. Access cannot be changed later; if wrong, delete and remake it. No
     approves. GitHub hides the tokens and never shows them again.
 
 ## Step 6: Build the server
+
+![You ask, Claude prepares, GitHub shows a preview, you approve, the robot builds it in Azure](diagrams/change.svg)
 
 1. GitHub > **Actions** > **Infrastructure** > **Run workflow** (`main`) >
    **Run workflow**.

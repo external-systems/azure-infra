@@ -6,6 +6,8 @@ happen: they run by themselves.
 
 ## The short version
 
+![The database is backed up automatically to storage in Texas, kept 30 days, with a copy in Illinois](../diagrams/backups.svg)
+
 - **Your databases are backed up automatically**, all the time, and kept
   for **30 days**.
 - You can get a database back **as it was at any minute** in those 30 days.

@@ -4,19 +4,16 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-		<title>azure-infra</title>
+		<title>azure-infra: the big picture</title>
 
 		<!-- reveal.js core styles. `reveal/` is added by the Nix build
 		     (flake-parts/slides.nix); it is not in this folder. -->
 		<link rel="stylesheet" href="reveal/reset.css" />
 		<link rel="stylesheet" href="reveal/reveal.css" />
 
-		<!-- Theme: swap black.css for white, league, moon, dracula, ...
-		     (see reveal/theme/ in the built output) -->
-		<link rel="stylesheet" href="reveal/theme/black.css" />
-
-		<!-- Colours for highlighted code blocks -->
-		<link rel="stylesheet" href="reveal/plugin/highlight/monokai.css" />
+		<!-- Theme: reveal's white theme with the Claude colours on top -->
+		<link rel="stylesheet" href="reveal/theme/white.css" />
+		<link rel="stylesheet" href="theme.css" />
 	</head>
 	<body>
 		<div class="reveal">
@@ -37,14 +34,15 @@
 
 		<script src="reveal/reveal.js"></script>
 		<script src="reveal/plugin/markdown.js"></script>
-		<script src="reveal/plugin/highlight.js"></script>
 		<script src="reveal/plugin/notes.js"></script>
 		<script>
 			// All options: https://revealjs.com/config/
 			Reveal.initialize({
 				hash: true, // keep the slide number in the URL, so refresh stays put
 				slideNumber: true,
-				plugins: [RevealMarkdown, RevealHighlight, RevealNotes],
+				width: 1600,
+				height: 1000,
+				plugins: [RevealMarkdown, RevealNotes],
 			});
 		</script>
 	</body>

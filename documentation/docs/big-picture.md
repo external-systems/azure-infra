@@ -5,6 +5,8 @@ and how you use it. No technical knowledge needed.
 
 ## The goals in one minute
 
+![The old server at Rackspace moves to Microsoft Azure in San Antonio, Texas](diagrams/move.svg)
+
 - **Written down, not clicked.** The whole server setup is described in
   plain files ("infrastructure as code"). The description *is* the server:
   what it says is what exists.
@@ -18,6 +20,8 @@ and how you use it. No technical knowledge needed.
   waits for your yes.
 
 ## Why a description instead of clicking (OpenTofu)
+
+![Clicking by hand is forgotten and error-prone; a written blueprint is previewed, recorded and repeatable](diagrams/blueprint.svg)
 
 Clicking through the Azure website works once, but nobody remembers
 exactly what was clicked, mistakes are easy, and doing it again (or undoing
@@ -37,6 +41,8 @@ makes Azure match it, like a builder working from a blueprint. You get:
 
 ## Why the secrets are in 1Password
 
+![1Password holds the keys to Azure and the server passwords; the robot reads the keys and saves the passwords; developers get the passwords](diagrams/keys.svg)
+
 Passwords and keys are never written in the project (it is public) and
 never typed into chats or emails.
 
@@ -51,6 +57,8 @@ never typed into chats or emails.
 
 ## What gets built
 
+![Developers pass a firewall to reach the server, which has three disks and sends backups to storage](diagrams/built.svg)
+
 | Piece | In plain words |
 |---|---|
 | The server | A Windows Server 2019 computer in Microsoft's data center in San Antonio, Texas, running SQL Server 2019 Web edition |
@@ -62,7 +70,13 @@ never typed into chats or emails.
 
 About **$385 a month** in total ([costs](guide/costs.md)).
 
+![About $385 a month: server and Windows $275, SQL license $25, disks $78, backups and address $9](diagrams/cost.svg)
+
 ## How you use it: just ask
+
+![Ask Claude in plain words: add a developer, more disk space, restore a backup, remove it all](diagrams/ask.svg)
+
+![You ask, Claude prepares, GitHub shows a preview, you approve, the robot builds it in Azure](diagrams/change.svg)
 
 Open Claude at <https://claude.ai/code> with the `external-systems/azure-infra`
 project and ask in your own words. Some examples, and what happens:

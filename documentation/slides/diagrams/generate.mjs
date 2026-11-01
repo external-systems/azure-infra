@@ -5,7 +5,8 @@
 //
 //   cd documentation/slides/diagrams && bun add --no-save roughjs@4.6.6 && bun generate.mjs
 //
-// Every diagram is 1600 x 900. Fixed seeds keep the output stable.
+// Every diagram is 1600 x 900 on the slide's cream background, so it also
+// reads on the docs' dark theme. Fixed seeds keep the output stable.
 import {readFileSync, writeFileSync} from "node:fs";
 import {dirname, join} from "node:path";
 import {fileURLToPath} from "node:url";
@@ -125,7 +126,7 @@ class Diagram {
     return this;
   }
   save(name) {
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">${this.parts.join("")}</svg>\n`;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900"><rect width="1600" height="900" rx="24" fill="#FAF9F5"/>${this.parts.join("")}</svg>\n`;
     writeFileSync(join(here, `${name}.svg`), svg);
   }
 }

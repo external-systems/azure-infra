@@ -10,6 +10,8 @@ the same way you would sit in front of it. Two things must be true first:
 The person who looks after the project (the operator, with Claude's help)
 does the first part, and shares the vault for the second.
 
+![A developer passes the firewall guest list to reach the server, logging in with a password from 1Password](../diagrams/remote.svg)
+
 ## Give a developer access (operator, about 10 minutes)
 
 Ask Claude: *"Give <name> Remote Desktop access."* It walks you through

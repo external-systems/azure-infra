@@ -277,7 +277,7 @@ in {
       variable = {
         onepassword_vault = {
           type = "string";
-          description = "1Password vault for the generated passwords; set by the wrapper.";
+          description = "1Password vault the generated logins are saved to (azure-infra-logins); set by the wrapper from .env.schema.";
         };
         # Private (public repo): read from 1Password item sql-server-settings.
         rdp_source_cidrs = {

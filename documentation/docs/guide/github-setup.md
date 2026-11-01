@@ -27,13 +27,13 @@ merge to main --(check, plan)--> apply waits for "Review deployments"
 
 ## 1. 1Password service accounts
 
-Create two (1Password.com > Developer > Service Accounts), both on the
-`azure-infra` vault. Access cannot be changed after creation.
+Create two (1Password.com > Developer > Service Accounts). Vault access
+cannot be changed after creation.
 
-| Service account | Vault access | Used by |
-|---|---|---|
-| `azure-infra-plan` | read | `plan` on pull requests and on `main` |
-| `azure-infra-apply` | read and write (writes the generated passwords) | `apply` |
+| Service account | `azure-infra` | `azure-infra-logins` | Used by |
+|---|---|---|---|
+| `azure-infra-plan` | read | read | `plan` on pull requests and on `main` |
+| `azure-infra-apply` | read | read and write (saves the generated logins) | `apply` |
 
 ## 2. Environments and secrets
 

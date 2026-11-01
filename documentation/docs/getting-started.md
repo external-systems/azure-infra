@@ -3,10 +3,13 @@
 This page takes you from **nothing** (no Azure account, no technical
 knowledge) to a running database server. You only need a **web browser**.
 You never install anything. GitHub's robot (GitHub Actions) does all the
-technical work for you.
+technical work; you only fill in the human parts: your details, a credit
+card, and a few codes that go into 1Password.
 
-Plan about **1 to 2 hours**, once. Do the steps in order. Each step says
-exactly what to click and what to type.
+Plan about **2 hours**, once. Do the steps in order. Each step says exactly
+what to click and what to type, and has a **Behind the scenes** box you can
+open if you are curious what is really going on. You never *need* to read
+those.
 
 ## Easiest: let Claude guide you
 
@@ -25,45 +28,64 @@ this page on your own: the steps are the same.
 
 !!! warning "Never paste codes into the chat"
     Show Claude error messages and what you see, but **never** a password,
-    key, secret or token. Those go only into 1Password.
+    key, secret or token. Those go only into 1Password. The project is
+    public: anyone on the internet can read it.
 
-Nothing on this page can break anything until the step 6 build, and even
+Nothing on this page can break anything until the step 7 build, and even
 that waits for your "yes". Stuck? Ask Claude or Andrew.
 
 ## What you will need
 
 - [ ] A computer with a web browser (Chrome, Edge, Safari or Firefox)
 - [ ] An email address and your phone (for codes)
-- [ ] A credit card (Azure checks your identity with it)
-- [ ] A **1Password** account (the password manager). Andrew can invite you.
-- [ ] A **GitHub** account with access to this project. Andrew can invite you.
+- [ ] A credit card (Azure checks your identity with it, and bills it
+      monthly, about $385; see [costs](guide/costs.md))
+- [ ] A **1Password** account (the password manager). Andrew invites you
+      to the family or team account.
+- [ ] A **GitHub** account (free, <https://github.com/signup>). Andrew adds
+      you to this project as **Admin**.
 
 ## The big picture
 
-You will do seven steps, and write the important codes into 1Password:
-
 | Step | What | Like... |
 |---|---|---|
-| 1 | A safe in 1Password | A locked drawer for all the keys |
+| 1 | Two safes in 1Password | A locked drawer for the keys, and one for the server's logins |
 | 2 | An Azure account | Renting the building |
 | 3 | Paste one line in Azure | Making the robot's key card and its notebook |
 | 4 | Two more entries in 1Password | A secret code and a short list of settings |
-| 5 | Tell GitHub how to open the safe | Giving the robot the drawer key |
-| 6 | Build the server | Pressing "go" and saying "yes" |
-| 7 | Talk to Claude | From now on, just ask |
+| 5 | Give GitHub's robot a key to the safe | Handing the robot the drawer key |
+| 6 | Lock the GitHub project | Only your people can make changes |
+| 7 | Build the server | Pressing "go" and saying "yes" |
+| 8 | Let developers in, and talk to Claude | From now on, just ask |
 
-!!! warning "The one rule"
-    Codes, passwords and keys go **only into 1Password**. Never paste them
-    into GitHub, an email, or a chat with Claude. The project is public:
-    anyone on the internet can read it.
+??? info "Behind the scenes: how the whole thing works"
+    The project on GitHub is a **written description** of the server: what
+    size it is, which region, which disks, who may connect. Nobody builds
+    it by clicking in Azure. Instead, a program called **OpenTofu** reads
+    the description, compares it with what exists in Azure, and makes Azure
+    match. GitHub's robot (GitHub Actions) runs OpenTofu for you, so nothing
+    runs on your computer.
 
-## Step 1: Make the safe in 1Password
+    Every change is first a **plan** ("this is what I would do"), which you
+    read (or Claude explains), and only becomes real after you click
+    **Approve**. The robot gets its keys from 1Password every time it runs,
+    and saves the passwords it creates back into 1Password.
+
+## Step 1: Make two safes (vaults) in 1Password
 
 1. Go to <https://my.1password.com> and sign in.
 2. On the left, click **New vault** (or the **+** next to "Vaults").
 3. Name it exactly: `azure-infra`. Click **Create**.
+4. Make a second one the same way, named exactly: `azure-infra-logins`.
 
-Done when: you see an empty vault called `azure-infra`.
+Done when: you see two empty vaults, `azure-infra` and
+`azure-infra-logins`.
+
+??? info "Behind the scenes: why two?"
+    `azure-infra` holds the keys to Azure itself: only you, Andrew and the
+    robot open it. `azure-infra-logins` will hold the server's Windows and
+    database passwords, which the robot creates. Developers who need to log
+    in to the server get access to that one only.
 
 **How to add an entry** (you will do this several times below):
 
@@ -95,8 +117,7 @@ Azure is Microsoft's cloud: you rent a computer there by the hour.
    **Pay-As-You-Go** and confirm.
 6. Protect yourself from surprise bills: search **Budgets**, click
    **+ Add**, amount `450` (dollars per month), add your email for alerts,
-   and **Create**. The server costs about $385 a month
-   ([details](guide/costs.md)).
+   and **Create**.
 7. Make sure Azure lets you rent a server this size: search **Quotas**,
    click **Compute**, set Region to **South Central US**, and search
    `DSv5`. The line **Standard DSv5 Family vCPUs** must allow at least
@@ -106,7 +127,14 @@ Azure is Microsoft's cloud: you rent a computer there by the hour.
 Done when: you can open the Azure portal and see your Pay-As-You-Go
 subscription.
 
-## Step 3: Run the setup script
+??? info "Behind the scenes"
+    The sign-up creates a **tenant** (your organization's directory of
+    people) and a **subscription** (the account Azure bills). Everything
+    the robot builds goes into that subscription, in the **South Central
+    US** region (San Antonio, Texas). The budget only sends emails; it never
+    switches anything off.
+
+## Step 3: Paste one line in Azure
 
 The robot needs two things in Azure: its own **login** (a key card), and a
 small locked **storage box** where it writes down what it built. One
@@ -139,8 +167,9 @@ pasted line makes both.
     ===================================================================
     ```
 
-5. **Right away**, put the first four into 1Password (the secret is shown
-   only once). Title: `azure-service-principal`. Fields:
+5. **Right away**, put the first four into 1Password, vault `azure-infra`
+   (the secret is shown only once). Title: `azure-service-principal`.
+   Fields:
 
     | Label | Type | Value |
     |---|---|---|
@@ -158,11 +187,29 @@ Done when: the 1Password item `azure-service-principal` has four filled
 fields. If something went wrong or you lost the secret, paste the same line
 again: it is safe to run twice.
 
+??? info "Behind the scenes: what that line did"
+    It downloaded a short, public script from this project
+    ([`scripts/azure-bootstrap.sh`](https://github.com/external-systems/azure-infra/blob/main/scripts/azure-bootstrap.sh))
+    and ran it as you, inside Azure. It:
+
+    - switched on the Azure services the server needs (compute, network,
+      storage, SQL);
+    - made a resource group `rg-azure-infra-state` with a private storage
+      account: the robot's notebook (the "state"), copied to a second
+      region and with 30 days of old versions kept;
+    - made a **service principal** called `azure-infra-tofu`: a login for
+      a program instead of a person, allowed to build things in your
+      subscription (role "Contributor"). The four values are its user
+      name (`client_id`), password (`client_secret`) and which Azure
+      account it belongs to.
+
 ## Step 4: Two more 1Password entries
 
-**A. The storage box's lock code.**
+Both in vault `azure-infra`.
 
-1. In 1Password, **+ New Item** > **Password**. Title: `tofu-state-passphrase`.
+**A. The notebook's lock code.**
+
+1. **+ New Item** > **Password**. Title: `tofu-state-passphrase`.
 2. In the password field, click the **generate** button (dice icon), set
    the length to the maximum, and **Save**.
 3. **Never change or delete this item.** Without it, the robot cannot read
@@ -170,46 +217,57 @@ again: it is safe to run twice.
 
 **B. The private settings.**
 
-1. In 1Password, **+ New Item** > **Password**. Title: `sql-server-settings`.
+1. **+ New Item** > **Password**. Title: `sql-server-settings`.
 2. Fields:
 
     | Label | Type | Value |
     |---|---|---|
     | `state_storage_account` | Text | the `state_storage_account` value from step 3 |
-    | `rdp_source_cidrs` | Text | your home internet address + `/32` (see below) |
+    | `rdp_source_cidrs` | Text | your home internet address + `/32` (see below), or empty |
     | `sql_source_cidrs` | Text | leave empty |
 
 3. Your home internet address: open <https://ifconfig.me> **at home**. It
    shows something like `203.0.113.7`. Type it with `/32` at the end:
-   `203.0.113.7/32`. This lets only your home connect to the server's
-   screen. Leave the field empty if nobody should connect yet.
+   `203.0.113.7/32`. Leave the field empty if nobody needs to log in to
+   the server's screen yet; developers are added later (step 8).
 
 Done when: the `azure-infra` vault has these three items:
 `azure-service-principal`, `tofu-state-passphrase`, `sql-server-settings`.
 
-## Step 5: Let GitHub open the safe
+??? info "Behind the scenes"
+    The robot's notebook contains the server's passwords, so it is locked
+    (encrypted) with `tofu-state-passphrase` before it is saved. The
+    settings item holds things that are not passwords but must not be
+    public: the notebook's address and the internet addresses allowed
+    through the server's firewall (`rdp_source_cidrs` for Remote Desktop,
+    `sql_source_cidrs` for direct database connections, off by default).
 
-GitHub's robot needs a key to the `azure-infra` vault. 1Password calls
-these **service accounts**. You make two: one that can only look (for
-previews) and one that can write (for real changes).
+## Step 5: Give GitHub's robot a key to the safe
+
+1Password calls these keys **service accounts**. You make two: one that
+can only look (for previews) and one that can also save the server's
+passwords (for real changes).
 
 **A. Make the two keys in 1Password.**
 
 1. Go to <https://my.1password.com>, click **Developer** on the left
    (or open <https://developer.1password.com> > **Service Accounts**), and
    click **New Service Account**.
-2. Name `azure-infra-plan`. Vault: `azure-infra` with **Read** only.
-   Create. It shows a token starting with `ops_`. Click **Save in
-   1Password** (choose your *Private* vault, not `azure-infra`).
-3. Again: name `azure-infra-apply`. Vault: `azure-infra` with **Read and
-   Write**. Create, and save its token the same way.
+2. Name `azure-infra-plan`. Give it the vault `azure-infra` with **Read**,
+   and the vault `azure-infra-logins` with **Read**. Create. It shows a
+   token starting with `ops_`. Click **Save in 1Password** (choose your
+   *Private* vault, not the azure ones).
+3. Again: name `azure-infra-apply`. Vault `azure-infra` with **Read**,
+   vault `azure-infra-logins` with **Read and Write**. Create, and save its
+   token the same way.
 
-If you do not see "Developer" or "Service Accounts", your 1Password plan
-may not include them: ask Andrew.
+Vault access cannot be changed later; if you got it wrong, delete the
+service account and make it again. If you do not see "Developer" or
+"Service Accounts", ask Andrew.
 
-**B. Give the keys to GitHub.** Open the project on GitHub:
-<https://github.com/external-systems/azure-infra>, then **Settings** (top
-right of the project; you need admin access, ask Andrew).
+**B. Give the keys to GitHub.** Open the project:
+<https://github.com/external-systems/azure-infra>, then **Settings** (the
+gear tab at the top of the project; you need Admin, ask Andrew).
 
 1. Left menu: **Environments** > **New environment**. Name: `azure-plan`.
    **Configure environment**.
@@ -226,13 +284,63 @@ right of the project; you need admin access, ask Andrew).
 6. **Add environment secret**: name `OP_SERVICE_ACCOUNT_TOKEN`, value the
    `azure-infra-apply` token. **Add secret**.
 
-That is the only place a key goes outside 1Password, and GitHub hides it.
+Done when: **Environments** lists `azure-plan` and `azure-production`, each
+with one secret.
 
-The project's other GitHub safety settings (who may make changes, a
-protected main branch) are Andrew's job:
-[GitHub setup](guide/github-setup.md).
+??? info "Behind the scenes"
+    An **environment** is a locked room the robot works in. The token is
+    the only key GitHub ever holds; GitHub keeps it hidden and gives it only
+    to jobs in that room. Previews (plans) run in `azure-plan` with the
+    look-only key. Real changes run in `azure-production`, only from the
+    `main` branch, and only after a required reviewer approves, with the key
+    that may also save passwords.
 
-## Step 6: Build the server
+## Step 6: Lock the GitHub project
+
+The project is public: anyone can read it. These settings make sure only
+your people can change it, and that strangers can never use your robot.
+All in the project's **Settings**.
+
+**A. Protect the main version** (Settings > **Rules** > **Rulesets**):
+
+1. **New ruleset** > **New branch ruleset**.
+2. Ruleset name: `protect main`. Enforcement status: **Active**.
+3. Target branches: **Add target** > **Include default branch**.
+4. Tick: **Restrict deletions**, **Require a pull request before
+   merging** (required approvals: `0`), **Require status checks to pass**
+   (tick "Require branches to be up to date"; click **Add checks** and add
+   `check` and `plan`), and **Block force pushes**.
+5. **Create**.
+
+**B. Control the robot** (Settings > **Actions** > **General**):
+
+1. Actions permissions: **Allow ... and select non-... actions**. Tick
+   **Allow actions created by GitHub**, and in the box below type
+   `DeterminateSystems/*`.
+2. Approval for running fork pull request workflows: **Require approval
+   for all external contributors**.
+3. Workflow permissions: **Read repository contents and packages
+   permissions**. Untick **Allow GitHub Actions to create and approve pull
+   requests**.
+4. **Save** under each section.
+
+**C. Keep strangers out** (Settings > **Moderation options** >
+**Interaction limits**): choose **Limit to repository collaborators**, for
+**6 months**. Put a reminder in your calendar to renew it.
+
+**D. Who may make changes** (Settings > **Collaborators and teams**): only
+you and Andrew (Admin), and anyone else Andrew says (Write). Developers who
+only need Remote Desktop do **not** need GitHub access.
+
+??? info "Behind the scenes"
+    `main` is the official version of the description; the robot builds
+    from it. With the ruleset, every change has to be a **pull request** (a
+    proposed change) whose checks and preview passed. Pull requests from
+    strangers' copies ("forks") never get the robot's keys, and the
+    interaction limit stops strangers from even opening one. Details for
+    Andrew: [GitHub setup](guide/github-setup.md).
+
+## Step 7: Build the server
 
 1. On GitHub, open the project and click **Actions** (top).
 2. On the left click **Infrastructure**. On the right click **Run
@@ -246,28 +354,46 @@ protected main branch) are Andrew's job:
 5. A yellow box says **Review deployments**. Click it, tick
    `azure-production`, and click **Approve and deploy**. This is the "yes".
 6. `apply` runs for about **15 to 25 minutes**. Green means done.
-7. Look in 1Password: there are two new items, `sql-web-01 Windows admin`
-   and `sql-web-01 SQL login`. They hold the server's address and its
-   passwords. The robot made them; you never had to.
+7. Look in 1Password, vault `azure-infra-logins`: there are two new items,
+   `sql-web-01 Windows admin` and `sql-web-01 SQL login`. They hold the
+   server's address and its passwords. The robot made them; nobody ever
+   typed or saw those passwords.
 
 If anything turns red: click it, copy the red text, and give it to Claude
 or Andrew.
 
-## Step 7: Talk to Claude from now on
+??? info "Behind the scenes: what the robot built"
+    In Azure, in a resource group `rg-sql-web-01`: a private network, a
+    firewall, a fixed public internet address, a Windows Server 2019
+    computer with SQL Server 2019 Web edition, three fast disks (Windows,
+    database files, database log), and a storage account for automatic
+    database backups ([backups](guide/backups.md)). It asked 1Password to
+    invent the Windows and database passwords and save them in
+    `azure-infra-logins`, then set them on the server. Finally it wrote
+    everything it did into its locked notebook, so next time it knows what
+    already exists. You can look at all of it in the Azure portal: search
+    **Resource groups** > `rg-sql-web-01`.
 
-From now on you change the server by **asking Claude in your browser**.
+## Step 8: Let developers in, and talk to Claude
+
+**Developers** connect to the server with Remote Desktop. To let one in,
+you add their internet address and share the logins vault:
+[Remote Desktop](guide/remote-desktop.md). Claude can walk you through it:
+*"Give Maria Remote Desktop access."*
+
+**Any other change**, ask Claude in your browser:
 
 1. Go to <https://claude.ai/code> (as in "Easiest: let Claude guide you"
    at the top).
 2. Pick the repository `external-systems/azure-infra`.
 3. Ask in plain words, for example:
     - "What is this server and what does it cost each month?"
-    - "Let my office internet connect to the server."
+    - "Are the backups working?"
     - "Make the server bigger."
 
 Claude makes a proposal, shows you what would change, what it costs, and
 whether the database goes offline, and only continues when you say
-**yes**. At the end, you click **Approve** on GitHub (like step 6.5).
+**yes**. At the end, you click **Approve** on GitHub (like step 7.5).
 More about this: [For the operator](operator.md).
 
 ## Words you might see
@@ -277,9 +403,14 @@ More about this: [For the operator](operator.md).
 | Azure | Microsoft's service where we rent the server |
 | Portal | Azure's website, <https://portal.azure.com> |
 | Subscription | Your Azure billing account |
+| Resource group | A folder in Azure that holds related things |
 | Vault | A folder in 1Password |
-| Service account / token | A key that lets a robot open the vault |
+| Service account / token | A key that lets a robot open a vault |
+| Service principal | The robot's own login to Azure |
 | GitHub Actions | The robot that builds and changes the server |
+| OpenTofu | The program the robot uses to build from the description |
+| State | The robot's notebook of what it built |
 | Plan | The robot's preview: "this is what I would change" |
 | Apply | The robot actually making the change, after your Approve |
 | Pull request (PR) | A proposed change, waiting for your yes |
+| Remote Desktop (RDP) | Seeing and using the server's screen from your computer |

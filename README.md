@@ -7,6 +7,9 @@ built with [terranix](https://terranix.org) and
 state lives in a private Azure storage account. This repo is
 public and holds no secrets.
 
+Docs: <https://external-systems.github.io/azure-infra/> (start with
+[Getting started](https://external-systems.github.io/azure-infra/getting-started.html)).
+
 ## Use
 
 Changes go through pull requests; GitHub Actions plans them on the pull

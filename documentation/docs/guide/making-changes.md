@@ -122,10 +122,7 @@ Firewall IPs are private, so they live in 1Password, not in the repo.
 2. Actions > Infrastructure > Run workflow on `main`.
 3. The plan should show only `allow_rdp` being added, changed or removed.
    Approve the deployment.
-4. Connect: the server's address is in the 1Password item `<name> Windows
-   admin` (its website field, `rdp://<address>`). Use Remote Desktop
-   (Windows: "Remote Desktop Connection"; Mac: "Windows App") with user
-   `azureadmin` and that item's password.
+4. Connect: see [Remote Desktop](remote-desktop.md).
 
 ### Let the web servers reach SQL Server
 

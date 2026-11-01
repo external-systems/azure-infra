@@ -24,9 +24,12 @@ environment of one tofu run   ARM_*, TF_VAR_*, TF_STATE_STORAGE_ACCOUNT
 
 ## 1. 1Password vault (and optionally a service account)
 
-1. Create a vault named `azure-infra` (the name is in the `op://`
-   references in `.env.schema` and in `TF_VAR_onepassword_vault`). Give
-   access to everyone who will run `plan`/`apply`.
+1. Create two vaults: `azure-infra` (the name is in the `op://`
+   references in `.env.schema`; everything OpenTofu needs) and
+   `azure-infra-logins` (`TF_VAR_onepassword_vault`; OpenTofu saves the
+   generated Windows and SQL logins there). Give `azure-infra` only to
+   people who run `plan`/`apply`; share `azure-infra-logins` with
+   developers who need Remote Desktop.
 2. Local use, recommended: the 1Password desktop app. Settings > Developer
    > "Integrate with 1Password CLI". Varlock and the OpenTofu 1Password
    provider then log in as you, with biometric unlock.
@@ -34,8 +37,9 @@ environment of one tofu run   ARM_*, TF_VAR_*, TF_STATE_STORAGE_ACCOUNT
    [1Password on NixOS](#1password-on-nixos) below), not from a plain
    package.
 3. CI or a machine without the desktop app: 1Password.com > Developer >
-   Service Accounts > create one with **read and write** on `azure-infra`
-   (write: OpenTofu stores the generated passwords). Vault access cannot be
+   Service Accounts > create one with **read** on `azure-infra` and
+   **read and write** on `azure-infra-logins` (OpenTofu saves the generated
+   logins). Vault access cannot be
    changed later. Save the `ops_...` token in another vault.
 
 ### 1Password on NixOS
@@ -163,6 +167,6 @@ small change, or Actions > Infrastructure > Run workflow on `main`).
 A first plan shows only `+` lines (about 17 resources). After the approval,
 `apply` takes roughly 15-25 minutes, most of it the SQL IaaS extension
 configuring storage. Afterwards 1Password has the two new login items; the
-server's address is in `<name> Windows admin`.
+server's address is in `<name> Windows admin` (vault `azure-infra-logins`).
 
 Locally (optional, Andrew): `check`, then `plan` in the devenv shell.

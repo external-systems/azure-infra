@@ -34,25 +34,31 @@ tools installed and do not need any. So:
 ## Getting started from nothing (first-time setup)
 
 If the server does not exist yet (they say "get started", "set up",
-"I have no Azure account", or the vault/environments are missing), you are
+"I have no Azure account", or the vaults/environments are missing), you are
 their guide through
-[documentation/docs/getting-started.md](../../documentation/docs/getting-started.md).
-Everything happens in their browser; you cannot click in Azure, 1Password
-or GitHub settings for them, so you tell them exactly what to click.
+[documentation/docs/getting-started.md](../../documentation/docs/getting-started.md)
+(8 steps). Everything happens in their browser; you cannot click in Azure,
+1Password or GitHub settings for them, so you tell them exactly what to
+click. The same page is online: <https://external-systems.github.io/azure-infra/getting-started.html>;
+give them that link if they want to read along.
 
 - **One step at a time.** Read the page, then give them only the current
   step, in your own simple words, with the links. Wait for "done" and
   check the step's "Done when" with them before moving on. Ask them where
   they are if they come back later.
+- **Be transparent.** Each step has a "Behind the scenes" box. After each
+  step, offer one or two plain sentences of what just happened and why
+  (for example "that line gave the robot its own login to Azure, allowed
+  to build things in your account"). Never hide what a step does.
 - **Never let a secret into the chat.** Codes, keys, tokens and passwords
   go from the screen straight into 1Password. Say so before steps 3 and 5.
   If they paste one anyway: tell them calmly, and have them make a new one
   (step 3: paste the setup line again; step 5: delete and recreate that
   service account) and update 1Password.
-- **Step 5 needs admin rights on the GitHub repo.** If they cannot see
-  **Settings** on the repo, stop and ask Andrew to do step 5 (or to make
-  them admin).
-- **Step 6 (first build):** you may start Actions > Infrastructure > Run
+- **Steps 5 and 6 need Admin on the GitHub repo.** If they cannot see
+  **Settings** on the repo, stop and ask Andrew to make them Admin (or to
+  do those steps).
+- **Step 7 (first build):** you may start Actions > Infrastructure > Run
   workflow on `main` for them if you have a tool for it; otherwise guide
   them. Read the `plan` job's output and explain it: a first build is
   only `+` (about 17 resources), roughly $385 a month
@@ -62,8 +68,11 @@ or GitHub settings for them, so you tell them exactly what to click.
   [troubleshooting](../../documentation/docs/guide/troubleshooting.md),
   and if it is not clear, stop and suggest asking Andrew.
 - After the first build: show them where the server's address and
-  passwords are (1Password items `sql-web-01 Windows admin` and
-  `sql-web-01 SQL login`), then explain how future changes work (below).
+  passwords are (1Password vault `azure-infra-logins`, items
+  `sql-web-01 Windows admin` and `sql-web-01 SQL login`; OpenTofu created
+  and saved them there), then step 8: developers' Remote Desktop access
+  ([remote-desktop.md](../../documentation/docs/guide/remote-desktop.md))
+  and how future changes work (below).
 
 ## The change loop (the only way to change the server)
 
@@ -117,7 +126,9 @@ Details for each step: [documentation/docs/guide/making-changes.md](../../docume
 | `documentation/docs/guide/costs.md` | Monthly cost estimate for the current settings | Yes: in the same PR as any size, disk, region or image change |
 
 Firewall IP addresses are **not** in the repo (it is public). They are in
-1Password, item `sql-server-settings`. Changing them is a 1Password edit
+1Password, vault `azure-infra`, item `sql-server-settings`. The generated
+logins are in vault `azure-infra-logins` (shared with developers; never
+share `azure-infra` with them). Changing them is a 1Password edit
 plus a manual workflow run; see the firewall recipe in making-changes.md.
 
 ## Route the task
@@ -127,6 +138,7 @@ plus a manual workflow run; see the firewall recipe in making-changes.md.
 | Understand what exists and why (in plain words) | [documentation/docs/guide/azure-concepts.md](../../documentation/docs/guide/azure-concepts.md) |
 | Change something (who can connect, size, disk space, patch time) | [documentation/docs/guide/making-changes.md](../../documentation/docs/guide/making-changes.md) |
 | Know what it costs, or what a change would cost | [documentation/docs/guide/costs.md](../../documentation/docs/guide/costs.md) |
+| Let a developer (or themselves) log in with Remote Desktop, or remove someone | [documentation/docs/guide/remote-desktop.md](../../documentation/docs/guide/remote-desktop.md) |
 | Know how backups work, check them, or get data back | [documentation/docs/guide/backups.md](../../documentation/docs/guide/backups.md) |
 | Know passwords, updates | [documentation/docs/guide/operations.md](../../documentation/docs/guide/operations.md) |
 | Fix a failed check, plan or apply | [documentation/docs/guide/troubleshooting.md](../../documentation/docs/guide/troubleshooting.md) |

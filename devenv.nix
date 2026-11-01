@@ -3,9 +3,10 @@
   # Keep in step with flake-parts/terranix.nix.
   varlock = "bunx varlock@1.24.0";
 in {
-  # azure-cli to look around by hand; bun runs Varlock. The 1Password CLI
-  # is unfree and comes from the flake instead: `nix run .#op`.
-  packages = [pkgs.azure-cli pkgs.bun];
+  # bun runs Varlock. The 1Password CLI is unfree and comes from the flake
+  # instead: `nix run .#op`. No azure-cli: its nixpkgs build is broken
+  # (python fabric marked broken); use Azure Cloud Shell or a local install.
+  packages = [pkgs.bun];
 
   scripts = {
     plan = {

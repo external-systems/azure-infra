@@ -5,7 +5,10 @@ Do this once per Azure subscription (sections 1-4) and once per person
 file in the repo.
 
 Tools: Nix and devenv. Everything else comes from the repo
-(`nix run .#op`, `az` in the devenv shell).
+(`nix run .#op`). For the Azure CLI (`az`) use
+[Azure Cloud Shell](https://shell.azure.com) (in the browser, already
+logged in, nothing to install) or install it on your machine; it is not in
+the devenv shell because its nixpkgs build is currently broken.
 
 ## How secrets reach OpenTofu
 
@@ -38,10 +41,11 @@ commands below use `nix run .#op`, which needs one of them too
 
 ## 2. Azure service principal
 
-In the devenv shell (`az` is on PATH):
+In [Azure Cloud Shell](https://shell.azure.com) (Bash), or anywhere `az`
+is installed:
 
 ```sh
-az login                                   # your own Azure account, in a browser
+az login                                   # not needed in Cloud Shell
 az account list -o table                   # find the subscription id
 az account set --subscription <subscription-id>
 az ad sp create-for-rbac --name azure-infra-tofu \
@@ -49,7 +53,8 @@ az ad sp create-for-rbac --name azure-infra-tofu \
 ```
 
 The last command prints `appId`, `password` and `tenant`. Store them right
-away (the password is shown once):
+away (the password is shown once), with the 1Password app or, back in the
+repo's devenv shell:
 
 ```sh
 nix run .#op -- item create --vault azure-infra --category password \

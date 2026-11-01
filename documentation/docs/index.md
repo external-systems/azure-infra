@@ -39,17 +39,17 @@ terranix/settings.nix --(Nix, terranix)--> config.tf.json --(OpenTofu)--> Azure
 
 ## Day to day
 
-Inside the devenv shell, from the repo root:
+Changes go through pull requests; GitHub Actions does the rest:
 
-```sh
-plan          # what would change (safe)
-apply         # change Azure, asks for yes
-tofu output   # public IP, private IP
-env-check     # are the 1Password values reachable? (redacted)
-fmt && check  # before every commit
-```
+| Where | What happens |
+|---|---|
+| Pull request to `main` | `check` and `plan`; the plan is posted on the pull request |
+| Merge to `main` | `plan` again, then `apply` after a reviewer approves `azure-production` |
+| Actions > Infrastructure > Run workflow | Plan and apply `main` without a code change |
+| Push to `main` | The docs are published to GitHub Pages |
 
-New here? Read [Azure concepts](guide/azure-concepts.md), then
-[First-time setup](guide/first-time-setup.md). To change something, see
-[Making changes](guide/making-changes.md). Working with an AI agent? See
+Nobody needs local tools. **Not technical?** Start with
+[For the operator](operator.md). Admins: [First-time setup](guide/first-time-setup.md)
+and [GitHub setup](guide/github-setup.md). Changing something:
+[Making changes](guide/making-changes.md). Working with an AI agent:
 [AI assistance](ai-skill.md).

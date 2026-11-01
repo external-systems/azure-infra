@@ -1,119 +1,127 @@
 ---
 name: azure-infra
-description: "Explain, configure, change, maintain and debug the external-systems/azure-infra repo: one Windows Server 2019 VM running SQL Server 2019 Web edition on Azure, built with terranix (Nix) and OpenTofu, credentials in 1Password, encrypted state in a private Hetzner S3 bucket. Written for people new to Azure and infrastructure as code. Load for any question or change about this repo, the SQL server, its firewall, disks, size, passwords, costs, plan/apply output, errors, or the move from Rackspace."
+description: "Help the operator of the external-systems/azure-infra repo understand and change their Azure SQL server through pull requests: one Windows Server 2019 VM with SQL Server 2019 Web edition, built with terranix and OpenTofu, planned and applied by GitHub Actions, secrets in 1Password. The operator may be completely non-technical and works only in a browser. Load for any question or change about this repo, the server, its firewall, size, disks, passwords, costs, a plan on a pull request, a failed run, or the move from Rackspace."
 ---
 
 # azure-infra
 
-This repo builds exactly one server on Microsoft Azure: a Windows Server
-2019 virtual machine with SQL Server 2019 **Web** edition, plus the network,
-firewall and disks around it. Nobody clicks around in the Azure portal to
-change it. The server is described in Nix files, OpenTofu compares that
-description with what exists in Azure, and it makes Azure match.
+This repo describes one rented computer at Microsoft Azure: a Windows
+server running the SQL Server database (Web edition), plus its network,
+firewall and disks. Nobody changes it by clicking in Azure. A change is a
+small edit to a file here; GitHub's robot (GitHub Actions) shows what the
+edit would do, a person says yes, and the robot makes the change.
 
-The people using this skill may know nothing about Azure, Nix or OpenTofu.
-Your job is to make a change safe for them: explain in plain words what a
-change does, what it costs and what can break, make the edit, then walk
-them through `plan` and `apply`. Never run `apply` yourself unless they
-explicitly ask, and never skip reading the plan with them.
+## Who you are talking to
 
-## The mental model (say this first to a newcomer)
+Assume the person (the **operator**) knows nothing about Azure, Terraform,
+Linux, Git or code, and is talking to you in a web browser. They have no
+tools installed and do not need any. So:
+
+- Use plain words and everyday comparisons. "The firewall is the front
+  door lock; this adds a key for your home internet connection." Avoid
+  jargon; if a term is unavoidable, explain it once in a sentence.
+- One step at a time. End each message with the single thing you need from
+  them, as a yes/no question when possible.
+- Always say three things about a change before asking for a yes: **what
+  changes**, **what it costs** (more or less per month, roughly), and
+  **whether the database goes offline** and for how long.
+- Never ask them to run a command, edit a file, or read code. You do that.
+  The only things they ever click: a link to approve the change on GitHub
+  ("Review deployments" > Approve), and, rarely, a field in 1Password.
+- If they seem unsure, stop and offer to wait for Andrew (the repo owner).
+  Saying no is always safe.
+
+## The change loop (the only way to change the server)
 
 ```
-settings.nix  --(Nix/terranix)-->  config.tf.json  --(OpenTofu)-->  Azure
- you edit                           generated                       real server
-                                        |
-                       state: what OpenTofu built last time
-                       (encrypted, in a private Hetzner bucket)
+1. Understand    ask what they want, restate it in one plain sentence
+2. Branch + edit a new branch, the smallest edit (usually terranix/settings.nix)
+3. Pull request  push, open a PR explaining the change in plain words
+4. Plan          GitHub runs `check` and `plan`, posts the plan on the PR
+5. Explain       read the plan, explain it plainly, ask "shall I go ahead?"
+6. Merge         only after a clear yes: merge the PR into main
+7. Approve       main runs the plan again; give them the "Review deployments"
+                 link, a reviewer approves, GitHub applies it
+8. Report        read the apply result, tell them it is done (or what failed)
 ```
 
-1. **You edit Nix** (`terranix/settings.nix`, rarely `terranix/sql-server.nix`).
-2. **`plan`** shows the difference between the files and Azure. Nothing
-   changes yet.
-3. **`apply`** shows the same plan and asks for `yes`, then changes Azure.
+Details for each step: [documentation/docs/guide/making-changes.md](../../documentation/docs/guide/making-changes.md).
 
-Every secret (Azure login, bucket keys, state passphrase, the server's
-passwords) and every private value (bucket name, firewall IPs) lives in
-1Password. [Varlock](https://varlock.dev) reads them through its 1Password
-plugin, using `.env.schema`, each time OpenTofu runs. The repo is
-**public**: no password, key, bucket name or IP address is ever committed.
+### Rules for the loop
+
+- **Never push to `main`.** It is protected anyway; every change is a PR.
+- **Never merge without the operator's explicit yes in this conversation**,
+  given after you explained the plan. "Do whatever you think" is not a yes
+  for anything that deletes, replaces or adds cost; ask again plainly.
+- **You never approve deployments.** A human clicks Approve in GitHub.
+- **Read the whole plan before explaining it.** Count the summary line
+  `Plan: X to add, Y to change, Z to destroy.` Anything in "destroy" or a
+  `-/+` (replace) on the VM (`azurerm_windows_virtual_machine`), a disk
+  (`azurerm_managed_disk`) or the resource group means **data loss**: do not
+  recommend it, explain the risk, and involve Andrew.
+- `check` or `plan` red on the PR: read the run log, fix the edit on the
+  same branch, push again. Don't bother the operator with logs; tell them
+  "I made a mistake in the change, fixing it" and carry on. Troubleshooting:
+  [documentation/docs/guide/troubleshooting.md](../../documentation/docs/guide/troubleshooting.md).
+- A plan that says "No changes" after an edit means the edit did nothing:
+  find out why before merging.
+- After merging, the apply waits for approval. If the plan on `main` differs
+  from the PR's plan (someone else merged in between), explain the
+  difference before they approve.
 
 ## Where things are
 
-| Path | What it is | Edit? |
+| Path | What it is | You edit it? |
 |---|---|---|
-| `terranix/settings.nix` | Name, region, VM size, SQL listener scope | Yes: most changes |
-| `terranix/sql-server.nix` | Every Azure resource and every option, with descriptions | For new features |
-| `terranix/state.nix` | Hetzner state backend and state encryption | Rarely |
-| `.env.schema` | Varlock schema: every credential as an `op://` 1Password reference | When adding a secret or renaming an item |
-| `terranix/load-secrets.nix` | Runs Varlock before each tofu command and passes the bucket to `init` | Rarely |
-| `flake-parts/terranix.nix` | Wires it into the flake; OpenTofu + providers | Rarely |
-| `dev/checks.nix` | Offline `tofu validate` run by `check` | Rarely |
-| `documentation/` | Human docs site and slide deck | Keep in step |
-| `.env` (git-ignored) | `OP_ACCOUNT` (desktop app) or `OP_SERVICE_ACCOUNT_TOKEN` | Never commit |
+| `terranix/settings.nix` | Name, region, VM size, disks, who may reach SQL | Yes: almost every change |
+| `terranix/sql-server.nix` | Every Azure resource and option, each with a description saying what it does and whether changing it rebuilds things | Only for new features, with Andrew |
+| `terranix/state.nix` | Where OpenTofu keeps its memory (encrypted, Hetzner bucket) | No |
+| `.env.schema` | Which 1Password entries feed which setting (references only) | No |
+| `.github/workflows/infra.yml` | The check, plan and apply robot | Never |
+| `.github/workflows/docs.yml` | Publishes the docs website | Never |
+| `documentation/docs/guide/` | The detailed guides (people and you read the same pages) | Keep in step with changes |
 
-## Commands (run from the repo root, inside the devenv shell)
-
-| Command | Does | Changes Azure? |
-|---|---|---|
-| `fmt` | Format and lint every file | No |
-| `check` | Lint, docs build, offline `tofu validate` | No |
-| `plan` | Init, then show what would change | No |
-| `apply` | Init, plan, ask `yes`, change Azure | **Yes** |
-| `tofu output` | Public/private IP, 1Password item ids | No |
-| `tofu state list` | Every resource OpenTofu manages | No |
-| `env-check` | Resolve `.env.schema` via 1Password, values redacted | No |
-| `nix run .#op -- <args>` | 1Password CLI (setup, checks) | No |
-
-Without the devenv shell: `nix run .#sql-server.plan`,
-`nix run .#sql-server.apply`, `nix run .#tofu -- <args>`.
+Firewall IP addresses are **not** in the repo (it is public). They are in
+1Password, item `sql-server-settings`. Changing them is a 1Password edit
+plus a manual workflow run; see the firewall recipe in making-changes.md.
 
 ## Route the task
 
-The detailed guides are the repo's documentation pages (one source for
-people and agents), at `documentation/docs/guide/` from the repo root:
-
-| The person wants to... | Read |
+| They want to... | Read |
 |---|---|
-| Understand what Azure things exist and why (resource group, VNet, NSG, disks, SQL IaaS, Web edition licensing) | [documentation/docs/guide/azure-concepts.md](../../documentation/docs/guide/azure-concepts.md) |
-| Set this up the first time (1Password, Azure service principal, Hetzner bucket, locks) | [documentation/docs/guide/first-time-setup.md](../../documentation/docs/guide/first-time-setup.md) |
-| Change something (open RDP, resize, grow a disk, allow web servers, patch window, region) and read a plan | [documentation/docs/guide/making-changes.md](../../documentation/docs/guide/making-changes.md) |
-| Keep it running (passwords, updates, costs, backups, upgrading pins) | [documentation/docs/guide/operations.md](../../documentation/docs/guide/operations.md) |
-| Fix an error | [documentation/docs/guide/troubleshooting.md](../../documentation/docs/guide/troubleshooting.md) |
-| Move the databases from the old Rackspace server | [documentation/docs/guide/migrating-from-rackspace.md](../../documentation/docs/guide/migrating-from-rackspace.md) |
+| Understand what exists and why (in plain words) | [documentation/docs/guide/azure-concepts.md](../../documentation/docs/guide/azure-concepts.md) |
+| Change something (who can connect, size, disk space, patch time) | [documentation/docs/guide/making-changes.md](../../documentation/docs/guide/making-changes.md) |
+| Know costs, passwords, updates, backups | [documentation/docs/guide/operations.md](../../documentation/docs/guide/operations.md) |
+| Fix a failed check, plan or apply | [documentation/docs/guide/troubleshooting.md](../../documentation/docs/guide/troubleshooting.md) |
+| Move the databases from Rackspace | [documentation/docs/guide/migrating-from-rackspace.md](../../documentation/docs/guide/migrating-from-rackspace.md) |
+| Set up GitHub, 1Password, Azure the first time (Andrew's job) | [documentation/docs/guide/github-setup.md](../../documentation/docs/guide/github-setup.md), [documentation/docs/guide/first-time-setup.md](../../documentation/docs/guide/first-time-setup.md) |
 
-## How to make any change safely
+## How to explain a plan
 
-1. **Restate the goal** in one sentence and say which file and option you
-   will change. Look the option up in `terranix/sql-server.nix`; its
-   `description` says what it does and whether changing it replaces things.
-2. **Warn before risky changes.** These replace (delete and recreate) the
-   VM or everything: `name`, `location`, `vm.adminUsername`, `vm.image`,
-   `resourceGroupName`, a disk's `lun`, shrinking any disk. `protectData`
-   (on by default) makes OpenTofu refuse to delete the VM or data disks;
-   never turn it off to "get a plan through" without the person's explicit
-   go-ahead and a verified database backup.
-3. **Edit, then `fmt` and `check`.** Both must pass.
-4. **Run `plan` and read it with them.** Count the symbols:
-   `+` create, `~` change in place, `-/+` replace, `-` destroy. Any `-` or
-   `-/+` on `azurerm_windows_virtual_machine`, `azurerm_managed_disk` or
-   `azurerm_resource_group` means data loss: stop and explain.
-5. **`apply` only when they agree.** It shows the plan again and waits for
-   `yes`.
-6. **Commit on a branch and open a PR.** Never push to `main`.
+Translate each resource line into one plain sentence, then the summary:
+
+| Plan says | Say |
+|---|---|
+| `+ azurerm_network_security_rule.allow_rdp` | "Adds a key to the front door so the listed internet connections can log in remotely." |
+| `~ azurerm_windows_virtual_machine.sql` with `~ size` | "Gives the server more (or less) power. It restarts once: the database is offline for about 5 minutes." |
+| `~ azurerm_managed_disk.data` with `~ disk_size_gb` | "Makes the database's storage bigger. No downtime. Afterwards one small step inside Windows (Andrew can do it)." |
+| `~ azurerm_mssql_virtual_machine.sql` | "Changes a SQL Server setting (patch time, who may connect). No downtime." |
+| `(sensitive value)` | "Hidden on purpose because the page is public; it's the IP list or a password." |
+| `-` or `-/+` on the VM, disks or resource group | "This would delete the server or its data. I don't recommend it." Then stop. |
+
+Prices: Azure's pricing changes, so give direction and rough size ("about
+twice the current server cost") and point to Cost Management in the Azure
+portal, or ask Andrew, rather than quoting exact numbers.
 
 ## Hard rules
 
-- Public repo: never write a secret, bucket name, IP address, subscription
-  or tenant id into any file, commit message, PR or log. Private values go
-  in 1Password, referenced from `.env.schema` as `op(op://azure-infra/<item>/<field>)`.
-- Never print secret values. Check presence with `printenv NAME >/dev/null`
-  or `nix run .#op -- item get <item> --vault azure-infra --fields label=<f>`
-  only when the person asks to see a value.
-- Never delete or overwrite state, run `tofu state rm`, `tofu import`,
-  `tofu force-unlock` or `destroy` without the person's explicit approval
-  for that exact command. Explain what it does first.
-- Never change the `tofu-state-passphrase` item: the state is encrypted
-  with it and becomes unreadable.
-- Load the `nix-style` and `terranix` skills (if installed) before
-  editing `.nix` files; the org style is enforced by `fmt`/`check`.
+- Public repo: never write a password, key, bucket name, IP address,
+  subscription or tenant id into a file, commit, PR text or comment.
+- Never edit workflows, secrets, environments or repository settings.
+- Never add `-auto-approve`, never remove `prevent_destroy`/`protectData`,
+  never run `destroy`, `state rm`, `import` or `force-unlock`.
+- Never change the `tofu-state-passphrase` item in 1Password.
+- If anything is unclear or risky, the answer is "let's ask Andrew", and
+  the PR stays open.
+- Load the `nix-style` and `terranix` skills (if installed) before editing
+  `.nix` files.

@@ -265,11 +265,13 @@ in {
         rdp_source_cidrs = {
           type = "string";
           default = "";
+          sensitive = true;
           description = "Comma-separated public CIDRs allowed to RDP (port 3389). Empty: no RDP from the internet.";
         };
         sql_source_cidrs = {
           type = "string";
           default = "";
+          sensitive = true;
           description = "Comma-separated public CIDRs allowed to reach SQL Server. Used only with sql.connectivity = \"PUBLIC\".";
         };
       };
@@ -350,7 +352,9 @@ in {
             priority = 100;
             port = 3389;
             sourcesVar = "rdp_source_cidrs";
-            enabledExpr = "length(local.rdp_source_cidrs) > 0";
+            # nonsensitive: the CIDRs are secret (CI logs are public), whether
+            # there are any is not, and count may not depend on secrets.
+            enabledExpr = "nonsensitive(length(local.rdp_source_cidrs) > 0)";
           };
           allow_sql = inboundRule {
             name = "allow-sql";
@@ -359,7 +363,7 @@ in {
             sourcesVar = "sql_source_cidrs";
             enabledExpr =
               if cfg.sql.connectivity == "PUBLIC"
-              then "length(local.sql_source_cidrs) > 0"
+              then "nonsensitive(length(local.sql_source_cidrs) > 0)"
               else "false";
           };
         };
@@ -493,11 +497,18 @@ in {
       };
     }
 
-    # --- Outputs (no secrets: those stay in 1Password) --- #
+    # --- Outputs (read with `tofu output -raw public_ip`) --- #
     {
       output = {
-        public_ip.value = publicIp;
-        private_ip.value = privateIp;
+        # sensitive: CI logs of this public repo are public.
+        public_ip = {
+          value = publicIp;
+          sensitive = true;
+        };
+        private_ip = {
+          value = privateIp;
+          sensitive = true;
+        };
         vm_id.value = ref "azurerm_windows_virtual_machine.sql.id";
         onepassword_vm_admin_item.value = ref "onepassword_item.vm_admin.uuid";
         onepassword_sql_login_item.value = ref "onepassword_item.sql_login.uuid";

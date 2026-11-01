@@ -110,18 +110,15 @@ OP_SERVICE_ACCOUNT_TOKEN=ops_...                                # service accoun
 Then `devenv allow` once per checkout (after `devenv hook` in your shell
 rc), and `env-check`: every line should be green, secrets redacted.
 
-## 6. Each checkout: locks and first plan
+## 6. GitHub and the first apply
 
-The first time the repo is cloned with no lock files committed yet:
+Lock files are committed. Do the [GitHub setup](github-setup.md) (service
+accounts, environments, `main` ruleset). Then open a pull request (any
+small change, or Actions > Infrastructure > Run workflow on `main`).
 
-```sh
-nix flake lock && nix run .#sync-locks
-git add flake.lock dev/flake.lock devenv.yaml devenv.lock
-check                       # lint, docs, offline tofu validate
-plan                        # first contact with Azure, 1Password and the bucket
-```
+A first plan shows only `+` lines (about 16 resources). After the approval,
+`apply` takes roughly 15-25 minutes, most of it the SQL IaaS extension
+configuring storage. Afterwards 1Password has the two new login items; the
+server's address is in `<name> Windows admin`.
 
-A first `plan` should show only `+` lines (about 16 resources). `apply`
-takes roughly 15-25 minutes, most of it the SQL IaaS extension configuring
-storage. Afterwards `tofu output` prints the public IP, and 1Password has
-the two new login items.
+Locally (optional, Andrew): `check`, then `plan` in the devenv shell.

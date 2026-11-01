@@ -9,26 +9,33 @@ public and holds no secrets.
 
 ## Use
 
-Needs Nix and devenv, and access to the `azure-infra` 1Password vault.
-First time: [First-time setup](documentation/docs/guide/first-time-setup.md).
+Changes go through pull requests; GitHub Actions plans them on the pull
+request and applies them on `main` after a reviewer approves the
+`azure-production` environment. Nobody needs local tools. Admin setup:
+[First-time setup](documentation/docs/guide/first-time-setup.md) and
+[GitHub setup](documentation/docs/guide/github-setup.md).
+
+Settings to change: `terranix/settings.nix`. Every option, with what it
+does: `terranix/sql-server.nix`.
+
+Locally (optional), in the devenv shell with access to the `azure-infra`
+1Password vault:
 
 ```sh
 devenv allow     # auto-activates the shell on cd (after `devenv hook`)
 env-check        # 1Password values reachable? (redacted)
 plan             # preview changes in Azure
 apply            # apply them (asks for yes)
-tofu output      # public and private IP
 ```
-
-Settings to change: `terranix/settings.nix`. Every option, with what it
-does: `terranix/sql-server.nix`.
 
 ## Docs and AI help
 
-- `docs-build`, then open `result-docs/index.html` (guide and slides), or
+- Published to GitHub Pages from `main` (`.github/workflows/docs.yml`).
+  Locally: `docs-build`, then open `result-docs/index.html`, or
   `devenv up` for live docs on :8981 and slides on :8982.
 - Agents: the `azure-infra` skill in `skills/azure-infra/` (linked from
-  `.claude/skills/`) explains the repo to people new to Azure.
+  `.claude/skills/`) lets a non-technical operator change the server by
+  talking to Claude in the browser.
 
 ## Develop
 

@@ -38,13 +38,13 @@ Note: Press `S` for the speaker view, `F` for fullscreen. Audience: people who w
 ## How a change happens
 
 ```
-settings.nix  ->  terranix  ->  config.tf.json  ->  OpenTofu  ->  Azure
+ask Claude -> pull request -> plan on the PR -> yes -> merge -> Approve -> apply
 ```
 
-1. Edit a Nix file
-2. `plan`: see the difference, nothing changes
-3. `apply`: type `yes`, Azure changes
-4. Open a PR
+1. Claude edits a file on a branch
+2. GitHub plans it: nothing changes yet
+3. You say yes, Claude merges
+4. A reviewer clicks Approve, GitHub applies it
 
 ---
 
@@ -83,16 +83,16 @@ Note: Any minus on the VM, a disk or the resource group means data loss. The rep
 
 - The `azure-infra` skill ships in the repo
 - Ask in plain words: "open RDP for my IP"
-- The agent edits, runs `check` and `plan`, explains
-- You decide on `apply`
+- The agent edits, opens a PR, explains GitHub's plan
+- You decide: merge, then Approve
 
 ---
 
 ## Common changes
 
-- Firewall IPs: edit `sql-server-settings` in 1Password, `apply`
-- Bigger VM: `vm.size`, `apply` (reboots)
-- Bigger disk: `disks.data.sizeGb`, `apply`, extend F: in Windows
+- Firewall IPs: edit `sql-server-settings` in 1Password, Run workflow
+- Bigger VM: `vm.size` (restarts once)
+- Bigger disk: `disks.data.sizeGb`, then extend F: in Windows
 - Patch window: `sql.autoPatching`
 
 ---
@@ -108,4 +108,4 @@ Note: Any minus on the VM, a disk or the resource group means data loss. The rep
 
 # Questions?
 
-Docs: `docs-build`, then open `result-docs/index.html`
+Docs: the GitHub Pages site of this repo

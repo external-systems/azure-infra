@@ -10,9 +10,11 @@ use_directory_urls: false
 
 nav:
   - Home: index.md
+  - For the operator: operator.md
   - Guide:
       - Azure concepts: guide/azure-concepts.md
       - First-time setup: guide/first-time-setup.md
+      - GitHub setup: guide/github-setup.md
       - Making changes: guide/making-changes.md
       - Operations: guide/operations.md
       - Troubleshooting: guide/troubleshooting.md

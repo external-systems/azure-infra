@@ -1,0 +1,10 @@
+name: Setup Nix
+description: Installs Determinate Nix and the FlakeHub cache (org convention)
+
+runs:
+  using: composite
+  steps:
+    - name: Install Nix
+      uses: DeterminateSystems/determinate-nix-action@main
+    - name: Nix cache
+      uses: DeterminateSystems/flakehub-cache-action@main

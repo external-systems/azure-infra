@@ -20,7 +20,7 @@ Lost the admin password: reset it as above; nothing in OpenTofu changes.
   a reboot in the window.
 - **SQL Server cumulative updates** beyond what the window installs: RDP in
   and run the CU installer, or use Azure Update Manager.
-- **OpenTofu, providers, terranix**: come from the flake pins. Bump in a PR:
+- **OpenTofu, providers, terranix**: come from the flake pins. Bump in a pull request:
   `nix flake update org-pkgs && nix run .#sync-locks` (nixpkgs, OpenTofu,
   providers) or `nix flake update terranix`. Then `check` and `plan`: a pin
   bump should give **no changes**. If the plan changes, read the provider's
@@ -54,8 +54,10 @@ Disk snapshots are not database backups: restore-tested `.bak` files are.
 
 ## Looking around safely
 
+Locally, in the devenv shell:
+
 ```sh
-tofu output                      # IPs and 1Password item ids
+tofu output -raw public_ip       # outputs with IPs are sensitive (public CI logs)
 tofu state list                  # everything OpenTofu manages
 tofu state show azurerm_windows_virtual_machine.sql
 az vm get-instance-view -g rg-<name> -n vm-<name> --query instanceView.statuses
@@ -67,6 +69,17 @@ IaaS extension's view (license, storage, patching).
 ## Drift
 
 If someone changed something in the portal, `plan` shows it as a change
-back to what the repo says. Either let `apply` undo the portal change, or
-copy the change into `settings.nix` so the repo matches. Never leave the
-two different.
+back to what the repo says. Either let `apply` undo the portal change
+(Actions > Infrastructure > Run workflow), or copy the change into
+`settings.nix` in a pull request so the repo matches. Never leave the two
+different.
+
+## CI
+
+- The only GitHub secret is `OP_SERVICE_ACCOUNT_TOKEN`, once per
+  environment. Rotate it by creating a new 1Password service account and
+  replacing the secret (`gh secret set ... --env ...`), then deleting the
+  old account.
+- GitHub Actions logs and pull request comments are public. Sensitive values
+  are redacted by OpenTofu; never add `TF_LOG` or `echo` of variables to a
+  workflow.

@@ -12,6 +12,22 @@ it; fix it in that phase, never by deleting state.
 | 5. `tofu apply` | `Error:` while creating/updating | Azure-side failures, SQL IaaS extension, timeouts |
 
 Run `check` first: it catches phases 1 and most schema mistakes offline.
+In CI, the failing job tells you the phase: `check` is phase 1, `plan`
+phases 2-4, `apply` phase 5. Open the run, then the red step.
+
+## GitHub Actions
+
+- `plan` or `apply` fails at once with `OP_SERVICE_ACCOUNT_TOKEN is not
+  set` / Varlock errors: the environment secret is missing or the service
+  account lost vault access. See [GitHub setup](github-setup.md).
+- `apply` shows "Waiting": it needs a reviewer to approve `azure-production`
+  (Review deployments). That is normal.
+- `apply` was skipped: the plan had no changes.
+- `Saved plan is stale`: something changed after the plan. Run the workflow
+  again (Actions > Infrastructure > Run workflow on `main`).
+- Merge button disabled: `check` or `plan` is red or still running.
+- A pull request from a fork shows skipped jobs: by design, forks never run
+  this repo's CI.
 
 ## 1. Nix evaluation
 

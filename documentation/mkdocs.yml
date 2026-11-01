@@ -10,6 +10,7 @@ use_directory_urls: false
 
 nav:
   - Home: index.md
+  - Getting started: getting-started.md
   - For the operator: operator.md
   - Guide:
       - Azure concepts: guide/azure-concepts.md

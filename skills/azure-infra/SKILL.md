@@ -96,6 +96,7 @@ plus a manual workflow run; see the firewall recipe in making-changes.md.
 | Know passwords, updates, backups | [documentation/docs/guide/operations.md](../../documentation/docs/guide/operations.md) |
 | Fix a failed check, plan or apply | [documentation/docs/guide/troubleshooting.md](../../documentation/docs/guide/troubleshooting.md) |
 | Move the databases from Rackspace | [documentation/docs/guide/migrating-from-rackspace.md](../../documentation/docs/guide/migrating-from-rackspace.md) |
+| Set up everything from zero, browser only (no Azure account yet) | [documentation/docs/getting-started.md](../../documentation/docs/getting-started.md): walk them through it one step at a time |
 | Set up GitHub, 1Password, Azure the first time (Andrew's job) | [documentation/docs/guide/github-setup.md](../../documentation/docs/guide/github-setup.md), [documentation/docs/guide/first-time-setup.md](../../documentation/docs/guide/first-time-setup.md) |
 
 ## How to explain a plan
